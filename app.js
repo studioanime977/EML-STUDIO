@@ -494,18 +494,18 @@ window.applyGradient = function () {
 
 // ── ADJUSTMENTS DIALOG ─────────────────────────────────────────────
 window.showAdjustments = function (type) {
-    if (!activeObj || activeObj.type !== 'image') return alert('Select an image layer.');
+    if (!activeObj || activeObj.type !== 'image') return alert(T('alert_select_img'));
     adjState = { type, target: activeObj };
-    document.getElementById('adj-title').textContent = type === 'brightness' ? 'Brightness / Contrast' : type === 'hue' ? 'Hue / Saturation' : 'Invert';
+    document.getElementById('adj-title').textContent = type === 'brightness' ? T('flt_brightness') : type === 'hue' ? T('flt_hue') : T('flt_invert');
     let body = '';
     if (type === 'brightness') {
-        body = `<label>Brightness</label><input type="range" id="adj-b" min="-100" max="100" value="0">
-                <label>Contrast</label><input type="range" id="adj-c" min="-100" max="100" value="0">`;
+        body = `<label>${T('adj_brightness')}</label><input type="range" id="adj-b" min="-100" max="100" value="0">
+                <label>${T('adj_contrast')}</label><input type="range" id="adj-c" min="-100" max="100" value="0">`;
     } else if (type === 'hue') {
-        body = `<label>Hue</label><input type="range" id="adj-h" min="-180" max="180" value="0">
-                <label>Saturation</label><input type="range" id="adj-s" min="-100" max="100" value="0">`;
+        body = `<label>${T('adj_hue')}</label><input type="range" id="adj-h" min="-180" max="180" value="0">
+                <label>${T('adj_saturation')}</label><input type="range" id="adj-s" min="-100" max="100" value="0">`;
     } else {
-        body = `<p style="padding:8px 0">Invert all colors of the selected image.</p>`;
+        body = `<p style="padding:8px 0">${T('adj_invert_desc')}</p>`;
     }
     document.getElementById('adj-body').innerHTML = body;
     document.getElementById('adj-dialog').style.display = 'flex';
@@ -564,6 +564,210 @@ window.removeAllFilters = function () {
     activeObj.filters = []; activeObj.applyFilters(); canvas.renderAll(); save();
 };
 
+// ── WATERMARK REMOVER ──────────────────────────────────────────────
+// Uses content-aware fill: samples surrounding pixels and paints over the selected region
+window.showWatermarkRemover = function () {
+    if (!activeObj || activeObj.type !== 'image') return alert(T('alert_select_img'));
+    // Show dialog via the adjustments panel
+    adjState = { type: 'watermark', target: activeObj };
+    document.getElementById('adj-title').textContent = T('flt_watermark');
+    document.getElementById('adj-body').innerHTML = `
+        <p style="color:var(--tx);font-size:11px;line-height:1.6;margin-bottom:10px">${T('wm_instructions')}</p>
+        <label>${T('wm_strength')}</label>
+        <input type="range" id="wm-strength" min="1" max="100" value="80">
+        <label>${T('wm_radius')}</label>
+        <input type="range" id="wm-radius" min="3" max="50" value="15">
+        <label>${T('wm_method')}</label>
+        <select id="wm-method" style="width:100%;background:var(--bg);border:1px solid var(--div);color:var(--txw);padding:4px;border-radius:4px">
+            <option value="blur">${T('wm_m_blur')}</option>
+            <option value="median">${T('wm_m_median')}</option>
+            <option value="clone">${T('wm_m_clone')}</option>
+        </select>
+    `;
+    document.getElementById('adj-dialog').style.display = 'flex';
+};
+
+// Override applyAdj to handle watermark
+const _origApplyAdj = window.applyAdj;
+window.applyAdj = function () {
+    if (adjState.type === 'watermark') {
+        applyWatermarkRemoval();
+        closeAdj();
+        return;
+    }
+    // original behavior
+    if (adjState.type === 'invert' && adjState.target) {
+        adjState.target.filters.push(new fabric.Image.filters.Invert());
+        adjState.target.applyFilters(); canvas.renderAll();
+    }
+    save(); closeAdj();
+};
+
+function applyWatermarkRemoval() {
+    const img = adjState.target;
+    if (!img || img.type !== 'image') return;
+
+    const strength = parseInt(document.getElementById('wm-strength')?.value || 80) / 100;
+    const radius = parseInt(document.getElementById('wm-radius')?.value || 15);
+    const method = document.getElementById('wm-method')?.value || 'blur';
+
+    // Get the image element's raw pixels
+    const el = img.getElement();
+    const w = el.naturalWidth || el.width;
+    const h = el.naturalHeight || el.height;
+
+    // Create offscreen canvas
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = w;
+    offCanvas.height = h;
+    const ctx = offCanvas.getContext('2d');
+    ctx.drawImage(el, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, w, h);
+    const data = imageData.data;
+
+    // Detect watermark: look for semi-transparent white/light overlays
+    // or repeated patterns that differ from surrounding content
+    const mask = detectWatermarkMask(data, w, h, strength);
+
+    // Inpaint the masked region
+    if (method === 'blur') {
+        inpaintBlur(data, mask, w, h, radius);
+    } else if (method === 'median') {
+        inpaintMedian(data, mask, w, h, radius);
+    } else {
+        inpaintClone(data, mask, w, h, radius);
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    // Replace the fabric image source
+    const dataURL = offCanvas.toDataURL('image/png');
+    fabric.Image.fromURL(dataURL, newImg => {
+        newImg.set({
+            left: img.left, top: img.top,
+            scaleX: img.scaleX, scaleY: img.scaleY,
+            angle: img.angle, flipX: img.flipX, flipY: img.flipY,
+            name: img.name + ' (cleaned)', _id: Date.now()
+        });
+        const idx = canvas.getObjects().indexOf(img);
+        canvas.remove(img);
+        canvas.insertAt(newImg, idx);
+        canvas.setActiveObject(newImg);
+        canvas.renderAll();
+        save();
+    });
+}
+
+function detectWatermarkMask(data, w, h, sensitivity) {
+    // Detect pixels that are likely watermark:
+    // High luminance, low saturation, semi-transparent look
+    const mask = new Uint8Array(w * h);
+    const threshold = 255 - Math.round(sensitivity * 80); // higher sensitivity = lower threshold
+
+    for (let i = 0; i < w * h; i++) {
+        const idx = i * 4;
+        const r = data[idx], g = data[idx+1], b = data[idx+2];
+        const lum = (r * 0.299 + g * 0.587 + b * 0.114);
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const sat = max === 0 ? 0 : (max - min) / max;
+
+        // White/light watermarks: high luminance + low saturation
+        if (lum > threshold && sat < 0.15) {
+            mask[i] = 1;
+        }
+        // Also detect very light near-white overlays
+        if (r > 200 && g > 200 && b > 200 && sat < 0.08) {
+            mask[i] = 1;
+        }
+    }
+
+    // Dilate mask slightly to cover edges
+    const dilated = new Uint8Array(mask);
+    for (let y = 1; y < h-1; y++) {
+        for (let x = 1; x < w-1; x++) {
+            if (mask[y*w+x]) {
+                dilated[(y-1)*w+x] = 1; dilated[(y+1)*w+x] = 1;
+                dilated[y*w+x-1] = 1; dilated[y*w+x+1] = 1;
+            }
+        }
+    }
+    return dilated;
+}
+
+function inpaintBlur(data, mask, w, h, radius) {
+    // For masked pixels, replace with average of surrounding non-masked pixels
+    const copy = new Uint8ClampedArray(data);
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            if (!mask[y*w+x]) continue;
+            let rr=0,gg=0,bb=0,count=0;
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    const ny = y+dy, nx = x+dx;
+                    if (ny<0||ny>=h||nx<0||nx>=w) continue;
+                    if (mask[ny*w+nx]) continue; // skip other masked pixels
+                    const ni = (ny*w+nx)*4;
+                    rr += copy[ni]; gg += copy[ni+1]; bb += copy[ni+2];
+                    count++;
+                }
+            }
+            if (count > 0) {
+                const i = (y*w+x)*4;
+                data[i] = rr/count; data[i+1] = gg/count; data[i+2] = bb/count;
+            }
+        }
+    }
+}
+
+function inpaintMedian(data, mask, w, h, radius) {
+    const copy = new Uint8ClampedArray(data);
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            if (!mask[y*w+x]) continue;
+            const rs=[],gs=[],bs=[];
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    const ny=y+dy, nx=x+dx;
+                    if (ny<0||ny>=h||nx<0||nx>=w||mask[ny*w+nx]) continue;
+                    const ni=(ny*w+nx)*4;
+                    rs.push(copy[ni]); gs.push(copy[ni+1]); bs.push(copy[ni+2]);
+                }
+            }
+            if (rs.length) {
+                rs.sort((a,b)=>a-b); gs.sort((a,b)=>a-b); bs.sort((a,b)=>a-b);
+                const mid = Math.floor(rs.length/2);
+                const i=(y*w+x)*4;
+                data[i]=rs[mid]; data[i+1]=gs[mid]; data[i+2]=bs[mid];
+            }
+        }
+    }
+}
+
+function inpaintClone(data, mask, w, h, radius) {
+    // Clone stamp: copy from nearest non-masked region
+    const copy = new Uint8ClampedArray(data);
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            if (!mask[y*w+x]) continue;
+            // Search outward in a spiral for a clean pixel
+            let found = false;
+            for (let r = 1; r <= radius*2 && !found; r++) {
+                for (let dy = -r; dy <= r && !found; dy++) {
+                    for (let dx = -r; dx <= r && !found; dx++) {
+                        if (Math.abs(dx)<r && Math.abs(dy)<r) continue;
+                        const ny=y+dy, nx=x+dx;
+                        if (ny<0||ny>=h||nx<0||nx>=w||mask[ny*w+nx]) continue;
+                        const si=(ny*w+nx)*4, di=(y*w+x)*4;
+                        data[di]=copy[si]; data[di+1]=copy[si+1]; data[di+2]=copy[si+2];
+                        found = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // ── LAYERS PANEL ───────────────────────────────────────────────────
 function refreshLayers() {
     if (!canvas) return;
@@ -580,7 +784,7 @@ function refreshLayers() {
             <div class="lthumb"><i class="ph ph-${icon}"></i></div>
             <span class="lname">${o.name||o.type}</span></div>`;
     }
-    $layers().innerHTML = h || '<em class="muted" style="padding:12px">No layers</em>';
+    $layers().innerHTML = h || `<em class="muted" style="padding:12px">${T('no_layers')}</em>`;
     if (activeObj && !activeObj._objects) {
         document.getElementById('l-opacity').value = Math.round((activeObj.opacity||1)*100);
         document.getElementById('blend-mode').value = activeObj.globalCompositeOperation || 'source-over';
@@ -607,7 +811,30 @@ window.deleteActive = () => {
 };
 window.bringForward = () => { if(activeObj){canvas.bringForward(activeObj);canvas.renderAll();refreshLayers();} };
 window.sendBackward = () => { if(activeObj){canvas.sendBackwards(activeObj);canvas.renderAll();refreshLayers();} };
-window.mergeDown = () => alert('Merge Down: flatten visible layers via Image > Flatten Image.');
+window.mergeDown = () => {
+    if (!activeObj || !canvas) return;
+    const objs = canvas.getObjects();
+    const idx = objs.indexOf(activeObj);
+    if (idx <= 0) return alert(T('alert_no_below'));
+    const below = objs[idx - 1];
+    // Render both into a temporary canvas
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = canvas.width; tmpCanvas.height = canvas.height;
+    const ctx = tmpCanvas.getContext('2d');
+    const tmpFabric = new fabric.StaticCanvas(tmpCanvas);
+    below.clone(c1 => {
+        activeObj.clone(c2 => {
+            tmpFabric.add(c1); tmpFabric.add(c2); tmpFabric.renderAll();
+            const url = tmpFabric.toDataURL({format:'png'});
+            fabric.Image.fromURL(url, merged => {
+                merged.set({left:0,top:0,name:'Merged',_id:Date.now()});
+                canvas.remove(below); canvas.remove(activeObj);
+                canvas.insertAt(merged, Math.max(0,idx-1));
+                canvas.setActiveObject(merged); canvas.renderAll(); save(); refreshLayers();
+            });
+        });
+    });
+};
 window.flattenImage = () => {
     if (!canvas) return;
     const url = canvas.toDataURL({format:'png',quality:1});
@@ -629,18 +856,18 @@ window.toggleLock = () => {
 
 // ── PROPERTIES PANEL ───────────────────────────────────────────────
 function refreshProps() {
-    if (!activeObj) { $props().innerHTML = '<em class="muted">No selection</em>'; return; }
+    if (!activeObj) { $props().innerHTML = `<em class="muted">${T('no_selection')}</em>`; return; }
     let h = '<div class="prop-group">';
-    h += `<label>Transform</label>
+    h += `<label>${T('prop_transform')}</label>
         <div class="prop-row">X:<input type="number" value="${Math.round(activeObj.left)}" onchange="activeObj.set('left',+this.value);canvas.renderAll()"> Y:<input type="number" value="${Math.round(activeObj.top)}" onchange="activeObj.set('top',+this.value);canvas.renderAll()"></div>
         <div class="prop-row">W:<input type="number" value="${Math.round(activeObj.width*(activeObj.scaleX||1))}" disabled> H:<input type="number" value="${Math.round(activeObj.height*(activeObj.scaleY||1))}" disabled></div>
         <div class="prop-row">Angle:<input type="number" value="${Math.round(activeObj.angle||0)}" onchange="activeObj.rotate(+this.value);canvas.renderAll()">°</div></div>`;
 
     if (activeObj.type === 'i-text') {
-        h += `<div class="prop-group"><label>Text</label>
-            <div class="prop-row">Color:<input type="color" value="${activeObj.fill||'#000'}" onchange="activeObj.set('fill',this.value);canvas.renderAll()"></div>
-            <div class="prop-row">Size:<input type="number" value="${activeObj.fontSize}" onchange="activeObj.set('fontSize',+this.value);canvas.renderAll()"></div>
-            <div class="prop-row">Font:<select onchange="activeObj.set('fontFamily',this.value);canvas.renderAll()">
+        h += `<div class="prop-group"><label>${T('prop_text')}</label>
+            <div class="prop-row">${T('prop_color')}:<input type="color" value="${activeObj.fill||'#000'}" onchange="activeObj.set('fill',this.value);canvas.renderAll()"></div>
+            <div class="prop-row">${T('prop_size_p')}:<input type="number" value="${activeObj.fontSize}" onchange="activeObj.set('fontSize',+this.value);canvas.renderAll()"></div>
+            <div class="prop-row">${T('prop_font')}:<select onchange="activeObj.set('fontFamily',this.value);canvas.renderAll()">
                 ${['Arial','Georgia','Courier New','Verdana','Impact','Comic Sans MS'].map(f=>`<option ${activeObj.fontFamily===f?'selected':''}>${f}</option>`).join('')}
             </select></div>
             <div class="prop-row" style="gap:4px">
@@ -652,22 +879,23 @@ function refreshProps() {
 
     if (['rect','ellipse','triangle','polygon','path'].includes(activeObj.type)) {
         const isGrad = typeof activeObj.fill === 'object';
-        h += `<div class="prop-group"><label>Shape</label>
-            <div class="prop-row">Fill:${isGrad?'<span>Gradient</span>':`<input type="color" value="${activeObj.fill||'#000'}" onchange="activeObj.set('fill',this.value);canvas.renderAll()">`}</div>
-            <div class="prop-row">Stroke:<input type="color" value="${activeObj.stroke||'#000'}" onchange="activeObj.set('stroke',this.value);canvas.renderAll()"> Width:<input type="number" value="${activeObj.strokeWidth||0}" style="width:40px" onchange="activeObj.set('strokeWidth',+this.value);canvas.renderAll()"></div>
-            <div class="prop-row">Radius:<input type="number" value="${activeObj.rx||0}" style="width:40px" onchange="activeObj.set({rx:+this.value,ry:+this.value});canvas.renderAll()"></div></div>`;
+        h += `<div class="prop-group"><label>${T('prop_shape')}</label>
+            <div class="prop-row">${T('prop_fill')}:${isGrad?'<span>Gradient</span>':`<input type="color" value="${activeObj.fill||'#000'}" onchange="activeObj.set('fill',this.value);canvas.renderAll()">`}</div>
+            <div class="prop-row">${T('prop_stroke')}:<input type="color" value="${activeObj.stroke||'#000'}" onchange="activeObj.set('stroke',this.value);canvas.renderAll()"> ${T('lbl_width')}:<input type="number" value="${activeObj.strokeWidth||0}" style="width:40px" onchange="activeObj.set('strokeWidth',+this.value);canvas.renderAll()"></div>
+            <div class="prop-row">${T('prop_radius')}:<input type="number" value="${activeObj.rx||0}" style="width:40px" onchange="activeObj.set({rx:+this.value,ry:+this.value});canvas.renderAll()"></div></div>`;
     }
 
     if (activeObj.type === 'image') {
-        h += `<div class="prop-group"><label>Image</label>
-            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="showAdjustments('brightness')">Brightness/Contrast</button></div>
-            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="showAdjustments('hue')">Hue/Saturation</button></div>
-            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="removeAllFilters()">Remove Filters</button></div></div>`;
+        h += `<div class="prop-group"><label>${T('prop_image')}</label>
+            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="showAdjustments('brightness')">${T('adj_brightness')}/${T('adj_contrast')}</button></div>
+            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="showAdjustments('hue')">${T('adj_hue')}/${T('adj_saturation')}</button></div>
+            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="removeAllFilters()">${T('prop_remove_flt')}</button></div>
+            <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px;color:var(--neon-pink)" onclick="showWatermarkRemover()">${T('flt_watermark')}</button></div></div>`;
     }
 
-    h += `<div class="prop-group"><label>Actions</label>
-        <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="flipHorizontal()">Flip H</button><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="flipVertical()">Flip V</button></div>
-        <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="activeObj.rotate((activeObj.angle||0)+90);canvas.renderAll()">Rotate 90°</button></div></div>`;
+    h += `<div class="prop-group"><label>${T('prop_actions')}</label>
+        <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="flipHorizontal()">${T('prop_flip_h')}</button><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="flipVertical()">${T('prop_flip_v')}</button></div>
+        <div class="prop-row"><button class="psbtn sec" style="font-size:10px;padding:2px 6px" onclick="activeObj.rotate((activeObj.angle||0)+90);canvas.renderAll()">${T('prop_rotate_90')}</button></div></div>`;
 
     $props().innerHTML = h;
 }
@@ -907,6 +1135,39 @@ const LANG = {
     alert_select_multi:{es:'Selecciona múltiples capas primero (Ctrl+clic).', en:'Select multiple layers first (Ctrl+click).' },
     alert_new_w:     { es:'Nuevo ancho:', en:'New width:' },
     alert_new_h:     { es:'Nuevo alto:', en:'New height:' },
+    alert_no_below:  { es:'No hay capa debajo para combinar.', en:'No layer below to merge.' },
+    // Watermark remover
+    flt_watermark:   { es:'⚡ Eliminar Marca de Agua', en:'⚡ Remove Watermark' },
+    wm_instructions: { es:'Ajusta la fuerza y radio para detectar y eliminar marcas de agua claras o semitransparentes de la imagen.', en:'Adjust strength and radius to detect and remove light or semi-transparent watermarks from the image.' },
+    wm_strength:     { es:'Fuerza de Detección', en:'Detection Strength' },
+    wm_radius:       { es:'Radio de Relleno', en:'Fill Radius' },
+    wm_method:       { es:'Método', en:'Method' },
+    wm_m_blur:       { es:'Difuminado Inteligente', en:'Smart Blur' },
+    wm_m_median:     { es:'Filtro Mediana', en:'Median Filter' },
+    wm_m_clone:      { es:'Clonación de Textura', en:'Texture Clone' },
+    // Adjustments dialog labels
+    adj_brightness:  { es:'Brillo', en:'Brightness' },
+    adj_contrast:    { es:'Contraste', en:'Contrast' },
+    adj_hue:         { es:'Tono', en:'Hue' },
+    adj_saturation:  { es:'Saturación', en:'Saturation' },
+    adj_invert_desc: { es:'Invertir todos los colores de la imagen seleccionada.', en:'Invert all colors of the selected image.' },
+    // Properties panel labels
+    prop_transform:  { es:'Transformar', en:'Transform' },
+    prop_text:       { es:'Texto', en:'Text' },
+    prop_shape:      { es:'Forma', en:'Shape' },
+    prop_image:      { es:'Imagen', en:'Image' },
+    prop_actions:    { es:'Acciones', en:'Actions' },
+    prop_color:      { es:'Color', en:'Color' },
+    prop_size_p:     { es:'Tamaño', en:'Size' },
+    prop_font:       { es:'Fuente', en:'Font' },
+    prop_fill:       { es:'Relleno', en:'Fill' },
+    prop_stroke:     { es:'Contorno', en:'Stroke' },
+    prop_radius:     { es:'Radio', en:'Radius' },
+    prop_remove_flt: { es:'Quitar Filtros', en:'Remove Filters' },
+    prop_flip_h:     { es:'Voltear H', en:'Flip H' },
+    prop_flip_v:     { es:'Voltear V', en:'Flip V' },
+    prop_rotate_90:  { es:'Rotar 90°', en:'Rotate 90°' },
+    no_layers:       { es:'Sin capas', en:'No layers' },
 };
 
 function T(key) { return LANG[key] ? (LANG[key][currentLang] || LANG[key].es) : key; }
