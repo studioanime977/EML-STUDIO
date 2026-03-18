@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EML STUDIO - Editor de Fotos</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fabric JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Tools menu -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <!-- Check if the assets folder contains the logo.png. For safety assuming the user will see it from UI or we can use error fallback -->
+                <img src="assets/logo.png" alt="EML STUDIO" class="logo" onerror="this.src=''; this.alt='📷 EML STUDIO'; this.classList.add('logo-fallback');">
+                <h1>EML STUDIO</h1>
+            </div>
+            
+            <nav class="tools-menu">
+                <button class="tool-btn active" id="btn-select" title="Mover / Seleccionar">
+                    <i class="ph ph-cursor"></i>
+                    <span>Mover</span>
+                </button>
+                <div class="separator"></div>
+                <button class="tool-btn" id="btn-rotate" title="Rotar Imagen">
+                    <i class="ph ph-arrows-clockwise"></i>
+                    <span>Rotar</span>
+                </button>
+                <button class="tool-btn" id="btn-filters" title="Ajustes y Filtros">
+                    <i class="ph ph-faders"></i>
+                    <span>Filtros</span>
+                </button>
+                <button class="tool-btn" id="btn-text" title="Agregar Texto">
+                    <i class="ph ph-text-t"></i>
+                    <span>Texto</span>
+                </button>
+                <button class="tool-btn" id="btn-crop" title="Recortar">
+                    <i class="ph ph-crop"></i>
+                    <span>Recortar</span>
+                </button>
+            </nav>
+
+            <div class="bottom-actions">
+                <label for="upload-image" class="action-btn upload-btn">
+                    <i class="ph ph-upload-simple"></i>
+                    <span>Subir Imagen</span>
+                    <input type="file" id="upload-image" accept="image/*" hidden>
+                </label>
+                <button class="action-btn download-btn" id="btn-download">
+                    <i class="ph ph-download-simple"></i>
+                    <span>Descargar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Canvas Area -->
+        <main class="workspace">
+            <div class="canvas-container-wrapper" id="canvas-wrapper">
+                <!-- Fabric JS will inject a canvas wrapper here -->
+                <canvas id="editor-canvas"></canvas>
+                
+                <!-- Welcome State -->
+                <div id="welcome-message" class="welcome-message">
+                    <div class="welcome-icon">
+                        <i class="ph ph-image"></i>
+                    </div>
+                    <h2>Empieza a crear</h2>
+                    <p>Sube una foto desde tu dispositivo sin marcas de agua de exportación.</p>
+                    <button class="btn-primary" onclick="document.getElementById('upload-image').click()">
+                        Subir imagen ahora
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Context / Properties Panel -->
+        <aside class="properties-panel">
+            <div class="panel-section context-properties">
+                <div class="panel-header">
+                    <h3>Propiedades</h3>
+                </div>
+                <div class="panel-content" id="properties-content">
+                    <div class="empty-state">
+                        <i class="ph ph-mouse-left"></i>
+                        <p>Selecciona un elemento en el lienzo para editar sus propiedades</p>
+                    </div>
+                    <!-- Dynamical content based on selection (Text settings, Filter settings) -->
+                </div>
+            </div>
+            
+            <div class="panel-section layers-section">
+                <div class="panel-header">
+                    <h3>Capas</h3>
+                    <button id="add-layer-btn" class="icon-btn" title="Nueva capa de imagen" onclick="document.getElementById('upload-image').click()">
+                        <i class="ph ph-plus"></i>
+                    </button>
+                </div>
+                <div class="layers-list" id="layers-list">
+                    <div class="empty-state">
+                        <p>No hay capas activas</p>
+                    </div>
+                    <!-- Interactive layers list -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
