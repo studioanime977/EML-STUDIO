@@ -1,500 +1,318 @@
-/* ===========================================
-   Variables & Reset
-   =========================================== */
+/* Photoshop Theme - Exact colors */
 :root {
-    --bg-dark: #121212;
-    --bg-panel: #1e1e1e;
-    --bg-panel-hover: #2c2c2c;
-    --border-color: #333333;
-    
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    
-    --accent-color: #0A84FF;
-    --accent-hover: #006ce6;
-    
-    --tool-active: rgba(10, 132, 255, 0.15);
-    
-    --font-family: 'Inter', sans-serif;
-    --border-radius: 8px;
-    --transition: all 0.2s ease;
+    --ps-darker: #313131;
+    --ps-dark: #3a3a3a;
+    --ps-panel: #535353;
+    --ps-panel-dark: #4b4b4b;
+    --ps-light: #b5b5b5;
+    --ps-lighter: #e1e1e1;
+    --ps-blue: #0070d6;
+    --ps-blue-hover: #0081f2;
+    --ps-border: #2b2b2b;
+    --ps-divider: #3e3e3e;
+    --ps-active-bg: #404040;
+    --ps-text: #cacaca;
+    --ps-text-light: #e6e6e6;
+    --font-ps: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: var(--font-family);
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
-    overflow: hidden; /* Prevent body scroll, layout handles it */
-}
-
-/* ===========================================
-   Layout Structure
-   =========================================== */
-.app-container {
-    display: flex;
+    background-color: var(--ps-darker);
+    color: var(--ps-text);
+    font-family: var(--font-ps);
+    font-size: 12px;
     height: 100vh;
-    width: 100vw;
-}
-
-/* Sidebar (Left) */
-.sidebar {
-    width: 80px;
-    min-width: 80px;
-    background-color: var(--bg-panel);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
-    z-index: 10;
-}
-
-/* Properties Panel (Right) */
-.properties-panel {
-    width: 300px;
-    min-width: 300px;
-    background-color: var(--bg-panel);
-    border-left: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-}
-
-/* Workspace (Center Canvas) */
-.workspace {
-    flex: 1;
-    background-color: var(--bg-dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
     overflow: hidden;
-    /* Subtle dot pattern background for canvas area */
-    background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
-    background-size: 20px 20px;
-}
-
-/* ===========================================
-   Sidebar Specifics
-   =========================================== */
-.logo-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    width: 100%;
 }
 
-.logo-container .logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    margin-bottom: 5px;
-}
+/* Scrollbars */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--ps-darker); border-left: 1px solid var(--ps-divider); }
+::-webkit-scrollbar-thumb { background: var(--ps-panel); border: 2px solid var(--ps-darker); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #666; }
 
-.logo-fallback {
+/* Utilities */
+input, select, button { font-family: inherit; font-size: inherit; outline: none; }
+.btn-ps { background: var(--ps-blue); border: 1px solid #00509e; color: white; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 500;}
+.btn-ps:hover { background: var(--ps-blue-hover); }
+.btn-secondary { background: var(--ps-panel); border: 1px solid var(--ps-divider); }
+.btn-secondary:hover { background: #606060; }
+.text-center { text-align: center; }
+
+/* Header */
+.app-header {
+    height: 30px;
+    background-color: var(--ps-darker);
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: #333;
-    font-size: 10px;
-    text-align: center;
-    color: white;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--ps-border);
+    flex-shrink: 0;
 }
+.header-logo { color: var(--ps-blue); font-weight: 700; margin-right: 20px; display:flex; align-items:center; gap:8px; font-size:13px; }
+.header-logo img { width: 18px; height: 18px; border-radius: 4px; }
+.fallback-logo { display: none; }
 
-.logo-container h1 {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
-.tools-menu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-}
-
-.tool-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    transition: var(--transition);
-}
-
-.tool-btn i {
-    font-size: 24px;
-}
-
-.tool-btn span {
-    font-size: 10px;
-    font-weight: 500;
-}
-
-.tool-btn:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-panel-hover);
-}
-
-.tool-btn.active {
-    color: var(--accent-color);
-    background-color: var(--tool-active);
-}
-
-.separator {
-    width: 40px;
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 5px 0;
-}
-
-.bottom-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    align-items: center;
-    padding-top: 20px;
-}
-
-.action-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    transition: var(--transition);
-}
-
-.action-btn i {
-    font-size: 22px;
-}
-
-.action-btn span {
-    font-size: 10px;
-}
-
-.upload-btn {
-    color: var(--text-secondary);
-}
-
-.upload-btn:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-panel-hover);
-}
-
-.download-btn {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.download-btn:hover {
-    background-color: var(--accent-hover);
-    transform: translateY(-2px);
-}
-
-/* ===========================================
-   Workspace / Canvas
-   =========================================== */
-.canvas-container-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
+.top-menu { display: flex; height: 100%; }
+.menu-item {
     position: relative;
-    padding: 20px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    color: var(--ps-lighter);
 }
+.menu-item:hover { background-color: var(--ps-active-bg); color: white; }
 
-.canvas-container {
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    background-color: transparent;
-    background-image: repeating-linear-gradient(45deg, #18181A 25%, transparent 25%, transparent 75%, #18181A 75%, #18181A), repeating-linear-gradient(45deg, #18181A 25%, #111111 25%, #111111 75%, #18181A 75%, #18181A);
-    background-position: 0 0, 10px 10px;
-    background-size: 20px 20px;
-    transition: var(--transition);
-}
-
-.welcome-message {
+/* Dropdown */
+.dropdown {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    max-width: 400px;
-    padding: 40px 30px;
-    background: var(--bg-panel);
-    border: 1px dashed var(--border-color);
-    border-radius: var(--border-radius);
-    z-index: 5;
-}
-
-.welcome-message.hidden {
+    top: 30px;
+    left: 0;
+    background-color: var(--ps-panel-dark);
+    border: 1px solid var(--ps-border);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
     display: none;
-}
-
-.welcome-icon {
-    font-size: 64px;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-}
-
-.welcome-message h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.welcome-message p {
-    color: var(--text-secondary);
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 25px;
-}
-
-.btn-primary {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: var(--border-radius);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-hover);
-}
-
-/* ===========================================
-   Properties Panel
-   =========================================== */
-.panel-section {
-    display: flex;
+    min-width: 220px;
+    z-index: 1000;
     flex-direction: column;
-    flex: 1;
-    overflow: hidden;
+    padding: 2px 0;
 }
-
-.context-properties {
-    flex: 1.5;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.layers-section {
-    flex: 1;
-}
-
-.panel-header {
+.menu-item:hover .dropdown { display: flex; }
+.dropdown-item {
+    padding: 5px 25px 5px 15px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.panel-header h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.icon-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
     cursor: pointer;
-    font-size: 16px;
+    color: var(--ps-text-light);
+}
+.dropdown-item:hover { background-color: var(--ps-blue); color: white; }
+.dropdown-item span { color: #aaa; font-size: 11px; }
+.dropdown-item:hover span { color: #eee; }
+.dropdown-divider { height: 1px; background-color: var(--ps-divider); margin: 3px 0; border-bottom: 1px solid #5a5a5a; }
+
+/* Options Bar */
+.options-bar {
+    height: 35px;
+    background-color: var(--ps-panel);
+    border-bottom: 1px solid var(--ps-border);
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: var(--transition);
+    padding: 0 10px;
+    gap: 15px;
+    flex-shrink: 0;
 }
+.tool-options-container { display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--ps-border); padding-right: 15px; }
+.options-tool-icon { font-size: 18px; color: var(--ps-text-light); }
 
-.icon-btn:hover {
-    color: var(--text-primary);
-}
+/* Main Layout */
+.main-layout { display: flex; flex: 1; overflow: hidden; }
 
-.panel-content, .layers-list {
-    padding: 20px;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.empty-state {
+/* Left Toolbar */
+.left-toolbar {
+    width: 44px;
+    background-color: var(--ps-panel);
+    border-right: 1px solid var(--ps-border);
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 5px 0;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+.toolbar-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    width: 28px;
+}
+.tool-btn {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    color: var(--ps-text-light);
+    display: flex;
     justify-content: center;
-    text-align: center;
-    color: var(--text-secondary);
-    height: 100%;
-    font-size: 13px;
-    line-height: 1.5;
-    opacity: 0.6;
+    align-items: center;
+    cursor: pointer;
 }
+.tool-btn:hover { background-color: var(--ps-active-bg); border-color: var(--ps-divider); color: white;}
+.tool-btn.active { background-color: var(--ps-darker); border-color: var(--ps-darker); box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5); color: white;}
+.tool-btn i { font-size: 16px; pointer-events:none;}
 
-.empty-state i {
-    font-size: 24px;
-    margin-bottom: 10px;
+/* Color Picker Widget */
+.color-picker-widget {
+    margin-top: 15px;
+    position: relative;
+    width: 28px;
+    height: 38px;
 }
+.color-swatch {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--ps-lighter);
+    position: absolute;
+    cursor: pointer;
+    padding: 0;
+    background-color: #000;
+}
+.bg-swatch { bottom: 0; right: 0; z-index: 1; }
+.fg-swatch { top: 0; left: 0; z-index: 2; }
+.color-picker-widget i { font-size: 12px; position: absolute; cursor: pointer; color: var(--ps-light); right:-8px; top:-8px;}
+.color-picker-widget i:hover { color: white; }
 
-/* Layer Items */
+/* Right Panels */
+.right-panels {
+    width: 280px;
+    min-width: 280px;
+    background-color: var(--ps-panel);
+    border-left: 1px solid var(--ps-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+.panel-group {
+    border-bottom: 2px solid var(--ps-darker);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.panel-tabs {
+    display: flex;
+    background-color: var(--ps-dark);
+    height: 26px;
+    border-bottom: 1px solid var(--ps-border);
+    flex-shrink: 0;
+}
+.tab {
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--ps-light);
+    border-right: 1px solid var(--ps-border);
+}
+.tab.active {
+    background-color: var(--ps-panel);
+    color: var(--ps-text-light);
+    font-weight: 500;
+    box-shadow: inset 0 2px 0 0 white;
+}
+.panel-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+
+/* Properties Panel Setup */
+.prop-form { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.prop-row { display: flex; justify-content: space-between; align-items: center; font-size:11px;}
+.prop-row input[type="range"] { flex:1; margin-left: 10px; }
+.prop-row input[type="color"] { width: 30px; height: 20px; border:none; padding:0; background:transparent;}
+
+/* Layer controls */
+.layer-bar-options {
+    display: flex;
+    padding: 8px 10px;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid var(--ps-divider);
+    font-size: 11px;
+    flex-shrink: 0;
+}
+.layer-blend select {
+    background: var(--ps-dark);
+    border: 1px solid var(--ps-divider);
+    color: var(--ps-text-light);
+    padding: 3px;
+    border-radius: 2px;
+    width: 100px;
+}
+.layer-opacity { display: flex; align-items: center; gap: 4px; }
+.layer-opacity input { width: 40px; background: transparent; border: 1px solid transparent; color: var(--ps-text-light); text-align: right; padding:2px;}
+.layer-opacity input:hover { border-color: var(--ps-divider); background: var(--ps-darker);}
+
+/* Layers List */
+.layer-list-container {
+    background: var(--ps-darker);
+}
 .layer-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 15px;
-    background-color: rgba(255,255,255,0.03);
-    border-radius: var(--border-radius);
-    margin-bottom: 8px;
+    height: 48px;
+    border-bottom: 1px solid var(--ps-divider);
+    padding: 0 10px;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: var(--transition);
 }
-
-.layer-item:hover {
-    background-color: rgba(255,255,255,0.05);
+.layer-item:hover { background-color: var(--ps-dark); }
+.layer-item.active { background-color: var(--ps-panel); border-left: 2px solid var(--ps-blue); padding-left: 8px;}
+.layer-eye { font-size: 16px; width: 20px; color: var(--ps-text-light); cursor: pointer;}
+.layer-thumb { 
+    width: 50px; 
+    height: 36px; 
+    background: white; 
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+    margin: 0 10px; 
+    border: 1px solid var(--ps-border); 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    overflow:hidden;
 }
+.layer-name { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; outline:none;}
 
-.layer-item.active {
-    background-color: var(--tool-active);
-    border-color: rgba(10, 132, 255, 0.3);
-}
-
-.layer-info {
+/* Panel Footer */
+.panel-footer-actions {
+    height: 35px;
+    background-color: var(--ps-panel);
+    border-top: 1px solid var(--ps-border);
     display: flex;
+    justify-content: flex-end;
     align-items: center;
-    gap: 10px;
-    font-size: 13px;
+    padding: 0 15px;
+    gap: 15px;
+    flex-shrink: 0;
+}
+.panel-footer-actions i { font-size: 18px; color: var(--ps-light); cursor: pointer; }
+.panel-footer-actions i:hover { color: white; }
+
+/* Workspace & Canvas */
+.workspace-area { 
+    flex: 1; 
+    background-color: #282828; 
+    position: relative; 
+    overflow: hidden; /* We manage scroll/pan manually if we use hand tool, or use overflow auto */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+.canvas-document {
+    background: white;
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    display: none; /* hidden until document is created */
+    position: relative;
 }
 
-.layer-info i {
-    color: var(--text-secondary);
-    font-size: 16px;
-}
-
-.layer-actions {
+/* Modal Desktop */
+.modal {
+    background: var(--ps-panel-dark);
+    padding: 30px;
+    border: 1px solid var(--ps-border);
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
     display: flex;
-    gap: 8px;
-    opacity: 0;
-    transition: var(--transition);
+    flex-direction: column;
+    gap: 15px;
+    min-width: 320px;
+    z-index: 1000;
 }
-
-.layer-item:hover .layer-actions, .layer-item.active .layer-actions {
-    opacity: 1;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-secondary);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        height: 70px;
-        min-height: 70px;
-        flex-direction: row;
-        padding: 0 15px;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .logo-container {
-        margin-bottom: 0;
-        width: auto;
-        margin-right: 20px;
-    }
-    
-    .logo-container h1 {
-        display: none; /* Hide text on mobile to save space */
-    }
-    
-    .tools-menu {
-        flex-direction: row;
-        justify-content: center;
-    }
-    
-    .separator {
-        width: 1px;
-        height: 30px;
-        margin: 0 10px;
-    }
-    
-    .bottom-actions {
-        padding-top: 0;
-        flex-direction: row;
-        width: auto;
-        margin-left: auto;
-    }
-    
-    .tool-btn, .action-btn {
-        width: 44px;
-        height: 44px;
-    }
-    
-    .tool-btn span, .action-btn span {
-        display: none; /* Hide labels */
-    }
-    
-    .properties-panel {
-        width: 100%;
-        height: 250px;
-        min-height: 250px;
-        border-left: none;
-        border-top: 1px solid var(--border-color);
-        flex-direction: row; /* Side by side properties / layers */
-    }
-    
-    .context-properties {
-        border-bottom: none;
-        border-right: 1px solid var(--border-color);
-    }
-}
+.modal h2 { font-weight: 500; font-size: 20px; color: white;}
+.modal img { width: 50px; margin: 0 auto; border-radius: 8px;}

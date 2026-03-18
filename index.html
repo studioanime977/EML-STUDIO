@@ -3,116 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EML STUDIO - Editor de Fotos</title>
+    <title>EML STUDIO - Photo Editor</title>
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Fabric JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar / Tools menu -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <!-- Check if the assets folder contains the logo.png. For safety assuming the user will see it from UI or we can use error fallback -->
-                <img src="assets/logo.png" alt="EML STUDIO" class="logo" onerror="this.src=''; this.alt='📷 EML STUDIO'; this.classList.add('logo-fallback');">
-                <h1>EML STUDIO</h1>
+<body class="photoshop-theme">
+    <!-- Top Menu -->
+    <header class="app-header">
+        <div class="header-logo"><img src="assets/logo.png" alt="PS" onerror="this.src=''; this.classList.add('fallback-logo')"> EML STUDIO</div>
+        <nav class="top-menu">
+            <div class="menu-item">Archivo
+                <div class="dropdown">
+                    <div class="dropdown-item" onclick="createNewDocument()">Nuevo... <span>Ctrl+N</span></div>
+                    <div class="dropdown-item" onclick="document.getElementById('upload-img').click()">Abrir... <span>Ctrl+O</span></div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="downloadImage()">Exportar como PNG... <span>Ctrl+E</span></div>
+                </div>
+            </div>
+            <div class="menu-item">Edición
+                <div class="dropdown">
+                    <div class="dropdown-item" onclick="undo()">Deshacer <span>Ctrl+Z</span></div>
+                    <div class="dropdown-item" onclick="redo()">Rehacer <span>Ctrl+Y</span></div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="deleteActive()">Borrar <span>Espacio</span></div>
+                </div>
+            </div>
+            <div class="menu-item">Capa
+                <div class="dropdown">
+                    <div class="dropdown-item" onclick="addNewEmptyLayer()">Nueva Capa... <span>Shift+Ctrl+N</span></div>
+                    <div class="dropdown-item" onclick="duplicateLayer()">Duplicar Capa <span>Ctrl+J</span></div>
+                </div>
+            </div>
+            <div class="menu-item">Filtro
+                 <div class="dropdown">
+                    <div class="dropdown-item" onclick="applyFilter('blur')">Desenfocar</div>
+                    <div class="dropdown-item" onclick="applyFilter('noise')">Añadir Ruido</div>
+                    <div class="dropdown-item" onclick="applyFilter('grayscale')">Blanco y Negro</div>
+                </div>
+            </div>
+            <div class="menu-item">Ayuda</div>
+        </nav>
+    </header>
+
+    <!-- Context/Options Bar -->
+    <div class="options-bar" id="options-bar">
+        <!-- Will be populated by JS depending on active tool -->
+        <div class="tool-options-container" id="tool-options">
+            <i class="ph ph-cursor options-tool-icon"></i>
+            <span class="options-label">Selección automática:</span>
+            <input type="checkbox" id="auto-select" checked>
+        </div>
+    </div>
+
+    <!-- Main App Layout -->
+    <div class="main-layout">
+        <!-- Left Toolbar -->
+        <aside class="left-toolbar" id="toolbar">
+            <div class="toolbar-grid">
+                <button class="tool-btn active" data-tool="select" title="Mover (V)"><i class="ph ph-cursor"></i></button>
+                <button class="tool-btn" data-tool="brush" title="Pincel (B)"><i class="ph ph-paint-brush-broad"></i></button>
+                <button class="tool-btn" data-tool="eraser" title="Borrador (E)"><i class="ph ph-eraser"></i></button>
+                <button class="tool-btn" data-tool="text" title="Texto (T)"><i class="ph ph-text-t"></i></button>
+                <button class="tool-btn" data-tool="shapes" title="Rectángulo (U)"><i class="ph ph-rectangle"></i></button>
+                <button class="tool-btn" data-tool="hand" title="Mano (H) / Paneo"><i class="ph ph-hand-palm"></i></button>
             </div>
             
-            <nav class="tools-menu">
-                <button class="tool-btn active" id="btn-select" title="Mover / Seleccionar">
-                    <i class="ph ph-cursor"></i>
-                    <span>Mover</span>
-                </button>
-                <div class="separator"></div>
-                <button class="tool-btn" id="btn-rotate" title="Rotar Imagen">
-                    <i class="ph ph-arrows-clockwise"></i>
-                    <span>Rotar</span>
-                </button>
-                <button class="tool-btn" id="btn-filters" title="Ajustes y Filtros">
-                    <i class="ph ph-faders"></i>
-                    <span>Filtros</span>
-                </button>
-                <button class="tool-btn" id="btn-text" title="Agregar Texto">
-                    <i class="ph ph-text-t"></i>
-                    <span>Texto</span>
-                </button>
-                <button class="tool-btn" id="btn-crop" title="Recortar">
-                    <i class="ph ph-crop"></i>
-                    <span>Recortar</span>
-                </button>
-            </nav>
-
-            <div class="bottom-actions">
-                <label for="upload-image" class="action-btn upload-btn">
-                    <i class="ph ph-upload-simple"></i>
-                    <span>Subir Imagen</span>
-                    <input type="file" id="upload-image" accept="image/*" hidden>
-                </label>
-                <button class="action-btn download-btn" id="btn-download">
-                    <i class="ph ph-download-simple"></i>
-                    <span>Descargar</span>
-                </button>
+            <div class="color-picker-widget">
+                <input type="color" id="primary-color" value="#000000" class="color-swatch fg-swatch">
+                <input type="color" id="secondary-color" value="#ffffff" class="color-swatch bg-swatch">
+                <i class="ph ph-arrows-down-up swap-colors" onclick="swapColors()" title="Invertir colores"></i>
             </div>
         </aside>
 
-        <!-- Main Canvas Area -->
-        <main class="workspace">
-            <div class="canvas-container-wrapper" id="canvas-wrapper">
-                <!-- Fabric JS will inject a canvas wrapper here -->
-                <canvas id="editor-canvas"></canvas>
-                
-                <!-- Welcome State -->
-                <div id="welcome-message" class="welcome-message">
-                    <div class="welcome-icon">
-                        <i class="ph ph-image"></i>
-                    </div>
-                    <h2>Empieza a crear</h2>
-                    <p>Sube una foto desde tu dispositivo sin marcas de agua de exportación.</p>
-                    <button class="btn-primary" onclick="document.getElementById('upload-image').click()">
-                        Subir imagen ahora
-                    </button>
-                </div>
+        <!-- Workspace canvas area -->
+        <main class="workspace-area" id="workspace-wrapper">
+            <!-- document canvas background container -->
+            <div class="canvas-document" id="canvas-document" style="display:none;">
+                <canvas id="ps-canvas"></canvas>
+            </div>
+            <!-- Initial Modal -->
+            <div id="welcome-modal" class="modal">
+                <img src="assets/logo.png" alt="PS Logo" onerror="this.src=''; this.style.display='none';">
+                <h2>EML STUDIO</h2>
+                <button class="btn-ps" onclick="createNewDocument(1280, 720)">Crear Nuevo (1280x720)</button>
+                <button class="btn-ps btn-secondary" onclick="document.getElementById('upload-img').click()">Abrir desde equipo...</button>
+                <input type="file" id="upload-img" accept="image/*" hidden>
             </div>
         </main>
 
-        <!-- Context / Properties Panel -->
-        <aside class="properties-panel">
-            <div class="panel-section context-properties">
-                <div class="panel-header">
-                    <h3>Propiedades</h3>
+        <!-- Right Panels -->
+        <aside class="right-panels">
+            <!-- Properties / Adjustments -->
+            <div class="panel-group" style="flex: 0 0 250px;">
+                <div class="panel-tabs">
+                    <div class="tab active">Propiedades</div>
                 </div>
-                <div class="panel-content" id="properties-content">
-                    <div class="empty-state">
-                        <i class="ph ph-mouse-left"></i>
-                        <p>Selecciona un elemento en el lienzo para editar sus propiedades</p>
-                    </div>
-                    <!-- Dynamical content based on selection (Text settings, Filter settings) -->
+                <div class="panel-content" id="properties-panel">
+                    <div class="empty-selection text-center" style="color:#aaa; font-style:italic; padding: 20px;">Sin selección</div>
                 </div>
             </div>
-            
-            <div class="panel-section layers-section">
-                <div class="panel-header">
-                    <h3>Capas</h3>
-                    <button id="add-layer-btn" class="icon-btn" title="Nueva capa de imagen" onclick="document.getElementById('upload-image').click()">
-                        <i class="ph ph-plus"></i>
-                    </button>
+
+            <!-- Layers Panel -->
+            <div class="panel-group" style="flex: 1; display:flex; flex-direction:column;">
+                <div class="panel-tabs">
+                    <div class="tab active">Capas</div>
                 </div>
-                <div class="layers-list" id="layers-list">
-                    <div class="empty-state">
-                        <p>No hay capas activas</p>
+                <!-- Layer blending options -->
+                <div class="layer-bar-options">
+                    <div class="layer-blend">
+                        <select id="layer-blend-mode">
+                            <option value="normal">Normal</option>
+                            <option value="multiply">Multiplicar</option>
+                            <option value="screen">Trama</option>
+                            <option value="overlay">Superponer</option>
+                        </select>
                     </div>
-                    <!-- Interactive layers list -->
+                    <div class="layer-opacity">
+                        <span>Opacidad:</span>
+                        <input type="number" id="layer-opacity-val" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <!-- Layer List Core -->
+                <div class="panel-content layer-list-container" id="layers-list">
+                    <!-- Javascript generates layer items here -->
+                </div>
+                <!-- Layer Footer Action Buttons -->
+                <div class="panel-footer-actions">
+                    <i class="ph ph-plus-square" title="Nueva capa" onclick="addNewEmptyLayer()"></i>
+                    <i class="ph ph-copy" title="Duplicar capa" onclick="duplicateLayer()"></i>
+                    <i class="ph ph-trash" title="Eliminar capa" onclick="deleteActive()"></i>
                 </div>
             </div>
         </aside>
     </div>
-
-    <!-- Scripts -->
     <script src="app.js"></script>
 </body>
 </html>
