@@ -118,3 +118,8 @@ input,select,button,textarea{font:inherit;outline:0}
 
 /* ====================== STATUS BAR ====================== */
 .status-bar{height:22px;background:var(--bg2);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 12px;gap:20px;font-size:10px;color:var(--tx2);flex-shrink:0}
+
+/* Language Toggle */
+.lang-toggle{background:var(--bg);border:1px solid var(--div);color:var(--txw);padding:2px 10px;border-radius:3px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:11px;margin-left:auto;margin-right:8px;transition:background .2s,border-color .2s}
+.lang-toggle:hover{background:var(--blue);border-color:var(--blue2)}
+.lang-toggle i{font-size:15px}

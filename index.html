@@ -14,88 +14,92 @@
     <header class="menu-bar">
         <div class="logo-area"><img src="assets/logo.png" alt="" onerror="this.style.display='none'"> EML STUDIO</div>
         <nav class="menus">
-            <div class="mi">File
+            <div class="mi"><span data-i18n="menu_file">Archivo</span>
                 <div class="dd">
-                    <div class="di" onclick="createNewDocument()">New… <small>Ctrl+N</small></div>
-                    <div class="di" onclick="document.getElementById('file-input').click()">Open… <small>Ctrl+O</small></div>
+                    <div class="di" onclick="createNewDocument()"><span data-i18n="file_new">Nuevo…</span> <small>Ctrl+N</small></div>
+                    <div class="di" onclick="document.getElementById('file-input').click()"><span data-i18n="file_open">Abrir…</span> <small>Ctrl+O</small></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="exportAs('png')">Export as PNG <small>Ctrl+Shift+S</small></div>
-                    <div class="di" onclick="exportAs('jpg')">Export as JPG</div>
-                    <div class="di" onclick="exportAs('json')">Save Project (.json)</div>
+                    <div class="di" onclick="exportAs('png')"><span data-i18n="file_export_png">Exportar como PNG</span> <small>Ctrl+Shift+S</small></div>
+                    <div class="di" onclick="exportAs('jpg')"><span data-i18n="file_export_jpg">Exportar como JPG</span></div>
+                    <div class="di" onclick="exportAs('json')"><span data-i18n="file_save_project">Guardar Proyecto (.json)</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="document.getElementById('file-json').click()">Load Project (.json)</div>
+                    <div class="di" onclick="document.getElementById('file-json').click()"><span data-i18n="file_load_project">Cargar Proyecto (.json)</span></div>
                 </div>
             </div>
-            <div class="mi">Edit
+            <div class="mi"><span data-i18n="menu_edit">Edición</span>
                 <div class="dd">
-                    <div class="di" onclick="undo()">Undo <small>Ctrl+Z</small></div>
-                    <div class="di" onclick="redo()">Redo <small>Ctrl+Y</small></div>
+                    <div class="di" onclick="undo()"><span data-i18n="edit_undo">Deshacer</span> <small>Ctrl+Z</small></div>
+                    <div class="di" onclick="redo()"><span data-i18n="edit_redo">Rehacer</span> <small>Ctrl+Y</small></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="copyObj()">Copy <small>Ctrl+C</small></div>
-                    <div class="di" onclick="pasteObj()">Paste <small>Ctrl+V</small></div>
-                    <div class="di" onclick="deleteActive()">Delete <small>Del</small></div>
+                    <div class="di" onclick="copyObj()"><span data-i18n="edit_copy">Copiar</span> <small>Ctrl+C</small></div>
+                    <div class="di" onclick="pasteObj()"><span data-i18n="edit_paste">Pegar</span> <small>Ctrl+V</small></div>
+                    <div class="di" onclick="deleteActive()"><span data-i18n="edit_delete">Eliminar</span> <small>Del</small></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="selectAll()">Select All <small>Ctrl+A</small></div>
-                    <div class="di" onclick="deselectAll()">Deselect <small>Ctrl+D</small></div>
+                    <div class="di" onclick="selectAll()"><span data-i18n="edit_select_all">Seleccionar Todo</span> <small>Ctrl+A</small></div>
+                    <div class="di" onclick="deselectAll()"><span data-i18n="edit_deselect">Deseleccionar</span> <small>Ctrl+D</small></div>
                 </div>
             </div>
-            <div class="mi">Image
+            <div class="mi"><span data-i18n="menu_image">Imagen</span>
                 <div class="dd">
-                    <div class="di" onclick="rotateCanvas(90)">Rotate Canvas 90° CW</div>
-                    <div class="di" onclick="rotateCanvas(-90)">Rotate Canvas 90° CCW</div>
+                    <div class="di" onclick="rotateCanvas(90)"><span data-i18n="img_rotate_cw">Rotar lienzo 90° ↻</span></div>
+                    <div class="di" onclick="rotateCanvas(-90)"><span data-i18n="img_rotate_ccw">Rotar lienzo 90° ↺</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="flipHorizontal()">Flip Horizontal</div>
-                    <div class="di" onclick="flipVertical()">Flip Vertical</div>
+                    <div class="di" onclick="flipHorizontal()"><span data-i18n="img_flip_h">Voltear Horizontal</span></div>
+                    <div class="di" onclick="flipVertical()"><span data-i18n="img_flip_v">Voltear Vertical</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="resizeCanvas()">Canvas Size…</div>
+                    <div class="di" onclick="resizeCanvas()"><span data-i18n="img_canvas_size">Tamaño del Lienzo…</span></div>
                 </div>
             </div>
-            <div class="mi">Layer
+            <div class="mi"><span data-i18n="menu_layer">Capa</span>
                 <div class="dd">
-                    <div class="di" onclick="addNewLayer()">New Layer <small>Shift+Ctrl+N</small></div>
-                    <div class="di" onclick="duplicateLayer()">Duplicate Layer <small>Ctrl+J</small></div>
-                    <div class="di" onclick="deleteActive()">Delete Layer</div>
+                    <div class="di" onclick="addNewLayer()"><span data-i18n="layer_new">Nueva Capa</span> <small>Shift+Ctrl+N</small></div>
+                    <div class="di" onclick="duplicateLayer()"><span data-i18n="layer_duplicate">Duplicar Capa</span> <small>Ctrl+J</small></div>
+                    <div class="di" onclick="deleteActive()"><span data-i18n="layer_delete">Eliminar Capa</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="mergeDown()">Merge Down <small>Ctrl+E</small></div>
-                    <div class="di" onclick="flattenImage()">Flatten Image</div>
+                    <div class="di" onclick="mergeDown()"><span data-i18n="layer_merge">Combinar Abajo</span> <small>Ctrl+E</small></div>
+                    <div class="di" onclick="flattenImage()"><span data-i18n="layer_flatten">Acoplar Imagen</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="bringForward()">Bring Forward</div>
-                    <div class="di" onclick="sendBackward()">Send Backward</div>
+                    <div class="di" onclick="bringForward()"><span data-i18n="layer_forward">Traer Adelante</span></div>
+                    <div class="di" onclick="sendBackward()"><span data-i18n="layer_backward">Enviar Atrás</span></div>
                 </div>
             </div>
-            <div class="mi">Filter
+            <div class="mi"><span data-i18n="menu_filter">Filtro</span>
                 <div class="dd">
-                    <div class="di" onclick="showAdjustments('brightness')">Brightness / Contrast…</div>
-                    <div class="di" onclick="showAdjustments('hue')">Hue / Saturation…</div>
-                    <div class="di" onclick="showAdjustments('invert')">Invert</div>
+                    <div class="di" onclick="showAdjustments('brightness')"><span data-i18n="flt_brightness">Brillo / Contraste…</span></div>
+                    <div class="di" onclick="showAdjustments('hue')"><span data-i18n="flt_hue">Tono / Saturación…</span></div>
+                    <div class="di" onclick="showAdjustments('invert')"><span data-i18n="flt_invert">Invertir</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="applyQuickFilter('grayscale')">Grayscale</div>
-                    <div class="di" onclick="applyQuickFilter('sepia')">Sepia</div>
-                    <div class="di" onclick="applyQuickFilter('vintage')">Vintage</div>
-                    <div class="di" onclick="applyQuickFilter('blur')">Blur</div>
-                    <div class="di" onclick="applyQuickFilter('sharpen')">Sharpen</div>
-                    <div class="di" onclick="applyQuickFilter('noise')">Add Noise</div>
-                    <div class="di" onclick="applyQuickFilter('pixelate')">Pixelate</div>
+                    <div class="di" onclick="applyQuickFilter('grayscale')"><span data-i18n="flt_grayscale">Escala de Grises</span></div>
+                    <div class="di" onclick="applyQuickFilter('sepia')"><span data-i18n="flt_sepia">Sepia</span></div>
+                    <div class="di" onclick="applyQuickFilter('vintage')"><span data-i18n="flt_vintage">Vintage</span></div>
+                    <div class="di" onclick="applyQuickFilter('blur')"><span data-i18n="flt_blur">Desenfocar</span></div>
+                    <div class="di" onclick="applyQuickFilter('sharpen')"><span data-i18n="flt_sharpen">Enfocar</span></div>
+                    <div class="di" onclick="applyQuickFilter('noise')"><span data-i18n="flt_noise">Añadir Ruido</span></div>
+                    <div class="di" onclick="applyQuickFilter('pixelate')"><span data-i18n="flt_pixelate">Pixelar</span></div>
                     <div class="sep"></div>
-                    <div class="di" onclick="removeAllFilters()">Remove All Filters</div>
+                    <div class="di" onclick="removeAllFilters()"><span data-i18n="flt_remove_all">Quitar Todos los Filtros</span></div>
                 </div>
             </div>
-            <div class="mi">View
+            <div class="mi"><span data-i18n="menu_view">Vista</span>
                 <div class="dd">
-                    <div class="di" onclick="zoomTo(1)">Actual Size <small>Ctrl+1</small></div>
-                    <div class="di" onclick="zoomTo('fit')">Fit to Screen <small>Ctrl+0</small></div>
+                    <div class="di" onclick="zoomTo(1)"><span data-i18n="view_actual">Tamaño Real</span> <small>Ctrl+1</small></div>
+                    <div class="di" onclick="zoomTo('fit')"><span data-i18n="view_fit">Ajustar a Pantalla</span> <small>Ctrl+0</small></div>
                     <div class="di" onclick="zoomTo(2)">Zoom 200%</div>
                     <div class="di" onclick="zoomTo(0.5)">Zoom 50%</div>
                 </div>
             </div>
-            <div class="mi">Help</div>
+            <div class="mi"><span data-i18n="menu_help">Ayuda</span></div>
         </nav>
-        <div class="title-info" id="title-info">No document</div>
+        <!-- LANGUAGE TOGGLE -->
+        <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" title="Cambiar idioma / Change language">
+            <i class="ph ph-translate"></i> <span id="lang-label">ES</span>
+        </button>
+        <div class="title-info" id="title-info" data-i18n="no_document">Sin documento</div>
     </header>
 
     <!-- ===== OPTIONS BAR ===== -->
     <div class="options-bar" id="options-bar">
-        <span id="tool-opts"><i class="ph ph-cursor"></i> Move Tool — Select and move layers</span>
+        <span id="tool-opts"><i class="ph ph-cursor"></i> <span data-i18n="tool_move">Herramienta Mover — Selecciona y mueve capas</span></span>
     </div>
 
     <!-- ===== MAIN LAYOUT ===== -->
@@ -103,29 +107,29 @@
         
         <!-- LEFT TOOLBAR -->
         <aside class="toolbar" id="toolbar">
-            <button class="tb active" data-tool="select" title="Move (V)"><i class="ph ph-cursor"></i></button>
-            <button class="tb" data-tool="marquee" title="Marquee (M)"><i class="ph ph-bounding-box"></i></button>
-            <button class="tb" data-tool="lasso" title="Lasso (L)"><i class="ph ph-selection-plus"></i></button>
-            <button class="tb" data-tool="wand" title="Magic Wand (W)"><i class="ph ph-magic-wand"></i></button>
-            <button class="tb" data-tool="crop" title="Crop (C)"><i class="ph ph-crop"></i></button>
-            <button class="tb" data-tool="eyedropper" title="Eyedropper (I)"><i class="ph ph-eyedropper"></i></button>
-            <button class="tb" data-tool="brush" title="Brush (B)"><i class="ph ph-paint-brush-broad"></i></button>
-            <button class="tb" data-tool="eraser" title="Eraser (E)"><i class="ph ph-eraser"></i></button>
-            <button class="tb" data-tool="bucket" title="Paint Bucket (G)"><i class="ph ph-paint-bucket"></i></button>
-            <button class="tb" data-tool="gradient" title="Gradient (G)"><i class="ph ph-gradient"></i></button>
-            <button class="tb" data-tool="blur-tool" title="Blur / Sharpen"><i class="ph ph-drop"></i></button>
-            <button class="tb" data-tool="dodge" title="Dodge / Burn (O)"><i class="ph ph-sun-dim"></i></button>
-            <button class="tb" data-tool="pen" title="Pen (P)"><i class="ph ph-pen-nib"></i></button>
-            <button class="tb" data-tool="text" title="Text (T)"><i class="ph ph-text-t"></i></button>
-            <button class="tb" data-tool="shapes" title="Shapes (U)"><i class="ph ph-rectangle"></i></button>
-            <button class="tb" data-tool="line" title="Line Tool"><i class="ph ph-line-segment"></i></button>
-            <button class="tb" data-tool="hand" title="Hand (H)"><i class="ph ph-hand-palm"></i></button>
+            <button class="tb active" data-tool="select" title="Mover (V)"><i class="ph ph-cursor"></i></button>
+            <button class="tb" data-tool="marquee" title="Marco (M)"><i class="ph ph-bounding-box"></i></button>
+            <button class="tb" data-tool="lasso" title="Lazo (L)"><i class="ph ph-selection-plus"></i></button>
+            <button class="tb" data-tool="wand" title="Varita Mágica (W)"><i class="ph ph-magic-wand"></i></button>
+            <button class="tb" data-tool="crop" title="Recortar (C)"><i class="ph ph-crop"></i></button>
+            <button class="tb" data-tool="eyedropper" title="Cuentagotas (I)"><i class="ph ph-eyedropper"></i></button>
+            <button class="tb" data-tool="brush" title="Pincel (B)"><i class="ph ph-paint-brush-broad"></i></button>
+            <button class="tb" data-tool="eraser" title="Borrador (E)"><i class="ph ph-eraser"></i></button>
+            <button class="tb" data-tool="bucket" title="Bote de Pintura (G)"><i class="ph ph-paint-bucket"></i></button>
+            <button class="tb" data-tool="gradient" title="Degradado"><i class="ph ph-gradient"></i></button>
+            <button class="tb" data-tool="blur-tool" title="Desenfocar / Enfocar"><i class="ph ph-drop"></i></button>
+            <button class="tb" data-tool="dodge" title="Sobreexponer / Subexponer (O)"><i class="ph ph-sun-dim"></i></button>
+            <button class="tb" data-tool="pen" title="Pluma (P)"><i class="ph ph-pen-nib"></i></button>
+            <button class="tb" data-tool="text" title="Texto (T)"><i class="ph ph-text-t"></i></button>
+            <button class="tb" data-tool="shapes" title="Formas (U)"><i class="ph ph-rectangle"></i></button>
+            <button class="tb" data-tool="line" title="Línea"><i class="ph ph-line-segment"></i></button>
+            <button class="tb" data-tool="hand" title="Mano (H)"><i class="ph ph-hand-palm"></i></button>
             <button class="tb" data-tool="zoom" title="Zoom (Z)"><i class="ph ph-magnifying-glass"></i></button>
             
             <div class="color-area">
-                <input type="color" id="fg-color" value="#000000" class="csw fg" title="Foreground">
-                <input type="color" id="bg-color" value="#ffffff" class="csw bg" title="Background">
-                <button class="swap-btn" onclick="swapColors()" title="Swap (X)"><i class="ph ph-swap"></i></button>
+                <input type="color" id="fg-color" value="#000000" class="csw fg" title="Color Primario">
+                <input type="color" id="bg-color" value="#ffffff" class="csw bg" title="Color Secundario">
+                <button class="swap-btn" onclick="swapColors()" title="Intercambiar (X)"><i class="ph ph-swap"></i></button>
             </div>
         </aside>
 
@@ -138,13 +142,13 @@
             <div id="welcome" class="welcome">
                 <img src="assets/logo.png" alt="" onerror="this.style.display='none'" style="width:60px; border-radius:10px;">
                 <h2>EML STUDIO</h2>
-                <p>Professional Photo Editor</p>
+                <p data-i18n="welcome_subtitle">Editor de Fotos Profesional</p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                    <button class="psbtn" onclick="createNewDocument(1920,1080)">New 1920×1080</button>
-                    <button class="psbtn" onclick="createNewDocument(1280,720)">New 1280×720</button>
-                    <button class="psbtn" onclick="createNewDocument(800,600)">New 800×600</button>
+                    <button class="psbtn" onclick="createNewDocument(1920,1080)"><span data-i18n="new_1920">Nuevo 1920×1080</span></button>
+                    <button class="psbtn" onclick="createNewDocument(1280,720)"><span data-i18n="new_1280">Nuevo 1280×720</span></button>
+                    <button class="psbtn" onclick="createNewDocument(800,600)"><span data-i18n="new_800">Nuevo 800×600</span></button>
                 </div>
-                <button class="psbtn sec" onclick="document.getElementById('file-input').click()">Open Image…</button>
+                <button class="psbtn sec" onclick="document.getElementById('file-input').click()"><span data-i18n="open_image">Abrir Imagen…</span></button>
                 <input type="file" id="file-input" accept="image/*" hidden>
                 <input type="file" id="file-json" accept=".json" hidden>
             </div>
@@ -152,25 +156,25 @@
 
         <!-- RIGHT PANELS -->
         <aside class="panels">
-            <!-- ADJUSTMENTS DIALOG (hidden by default) -->
+            <!-- ADJUSTMENTS DIALOG -->
             <div id="adj-dialog" class="adj-dialog" style="display:none">
-                <div class="adj-header"><span id="adj-title">Adjustments</span><button onclick="closeAdj()" class="adj-close">✕</button></div>
+                <div class="adj-header"><span id="adj-title" data-i18n="adjustments">Ajustes</span><button onclick="closeAdj()" class="adj-close">✕</button></div>
                 <div class="adj-body" id="adj-body"></div>
                 <div class="adj-footer">
-                    <button class="psbtn sec" onclick="closeAdj()">Cancel</button>
+                    <button class="psbtn sec" onclick="closeAdj()"><span data-i18n="cancel">Cancelar</span></button>
                     <button class="psbtn" onclick="applyAdj()">OK</button>
                 </div>
             </div>
 
             <!-- Properties -->
             <div class="pnl" style="flex:0 0 200px">
-                <div class="pnl-tabs"><span class="ptab on">Properties</span><span class="ptab">Adjustments</span></div>
-                <div class="pnl-body" id="props-body"><em class="muted">No selection</em></div>
+                <div class="pnl-tabs"><span class="ptab on" data-i18n="tab_properties">Propiedades</span><span class="ptab" data-i18n="tab_adjustments">Ajustes</span></div>
+                <div class="pnl-body" id="props-body"><em class="muted" data-i18n="no_selection">Sin selección</em></div>
             </div>
 
             <!-- Layers -->
             <div class="pnl" style="flex:1; display:flex; flex-direction:column">
-                <div class="pnl-tabs"><span class="ptab on">Layers</span><span class="ptab">Channels</span><span class="ptab">Paths</span></div>
+                <div class="pnl-tabs"><span class="ptab on" data-i18n="tab_layers">Capas</span><span class="ptab" data-i18n="tab_channels">Canales</span><span class="ptab" data-i18n="tab_paths">Trazados</span></div>
                 <div class="layer-header">
                     <select id="blend-mode">
                         <option value="source-over">Normal</option>
@@ -190,20 +194,20 @@
                         <option value="color">Color</option>
                         <option value="luminosity">Luminosity</option>
                     </select>
-                    <div class="lop">Opacity: <input type="number" id="l-opacity" value="100" min="0" max="100">%</div>
+                    <div class="lop"><span data-i18n="opacity">Opacidad</span>: <input type="number" id="l-opacity" value="100" min="0" max="100">%</div>
                 </div>
                 <div class="lock-row">
-                    Lock: <i class="ph ph-lock-simple-open" id="lock-btn" onclick="toggleLock()" title="Lock/Unlock layer"></i>
-                    <span style="margin-left:auto">Fill: <input type="number" id="l-fill" value="100" min="0" max="100" style="width:35px">%</span>
+                    <span data-i18n="lock">Bloquear</span>: <i class="ph ph-lock-simple-open" id="lock-btn" onclick="toggleLock()" title="Bloquear/Desbloquear capa"></i>
+                    <span style="margin-left:auto"><span data-i18n="fill">Relleno</span>: <input type="number" id="l-fill" value="100" min="0" max="100" style="width:35px">%</span>
                 </div>
                 <div class="pnl-body layers-scroll" id="layers-list"></div>
                 <div class="layer-footer">
-                    <i class="ph ph-folder-notch" title="New Group" onclick="groupLayers()"></i>
-                    <i class="ph ph-plus-square" title="New Layer" onclick="addNewLayer()"></i>
-                    <i class="ph ph-copy" title="Duplicate" onclick="duplicateLayer()"></i>
-                    <i class="ph ph-arrow-fat-up" title="Bring Forward" onclick="bringForward()"></i>
-                    <i class="ph ph-arrow-fat-down" title="Send Backward" onclick="sendBackward()"></i>
-                    <i class="ph ph-trash" title="Delete" onclick="deleteActive()"></i>
+                    <i class="ph ph-folder-notch" title="Nuevo Grupo" onclick="groupLayers()"></i>
+                    <i class="ph ph-plus-square" title="Nueva Capa" onclick="addNewLayer()"></i>
+                    <i class="ph ph-copy" title="Duplicar" onclick="duplicateLayer()"></i>
+                    <i class="ph ph-arrow-fat-up" title="Traer Adelante" onclick="bringForward()"></i>
+                    <i class="ph ph-arrow-fat-down" title="Enviar Atrás" onclick="sendBackward()"></i>
+                    <i class="ph ph-trash" title="Eliminar" onclick="deleteActive()"></i>
                 </div>
             </div>
         </aside>

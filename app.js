@@ -127,16 +127,16 @@ function setTool(name) {
     let html = '';
     switch (name) {
         case 'select':
-            html = `<i class="ph ph-cursor"></i> Move Tool`;
+            html = `<i class="ph ph-cursor"></i> ${T('tool_move')}`;
             break;
 
         case 'marquee':
-            html = `<i class="ph ph-bounding-box"></i> Marquee — drag to select region`;
+            html = `<i class="ph ph-bounding-box"></i> ${T('tool_marquee')}`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'lasso':
-            html = `<i class="ph ph-selection-plus"></i> Lasso — freehand select (draws path)`;
+            html = `<i class="ph ph-selection-plus"></i> ${T('tool_lasso')}`;
             canvas.isDrawingMode = true;
             canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
             canvas.freeDrawingBrush.color = 'rgba(0,100,255,0.3)';
@@ -144,24 +144,24 @@ function setTool(name) {
             break;
 
         case 'wand':
-            html = `<i class="ph ph-magic-wand"></i> Magic Wand — click to auto‑select similar objects`;
+            html = `<i class="ph ph-magic-wand"></i> ${T('tool_wand')}`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'crop':
-            html = `<i class="ph ph-crop"></i> Crop — drag area then <button class="psbtn" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyCrop()">Apply Crop</button>`;
+            html = `<i class="ph ph-crop"></i> ${T('tool_crop')} <button class="psbtn" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyCrop()">${T('lbl_apply_crop')}</button>`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'eyedropper':
-            html = `<i class="ph ph-eyedropper"></i> Eyedropper — click to sample color`;
+            html = `<i class="ph ph-eyedropper"></i> ${T('tool_eyedropper')}`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'brush':
-            html = `<i class="ph ph-paint-brush-broad"></i> Brush <span class="opt-sep"></span>
-                Size: <input type="range" id="bsize" min="1" max="200" value="8"> <span id="bsv">8px</span>
-                <span class="opt-sep"></span> Opacity: <input type="range" id="bopa" min="1" max="100" value="100"> <span id="bov">100%</span>`;
+            html = `<i class="ph ph-paint-brush-broad"></i> ${T('tool_brush')} <span class="opt-sep"></span>
+                ${T('lbl_size')}: <input type="range" id="bsize" min="1" max="200" value="8"> <span id="bsv">8px</span>
+                <span class="opt-sep"></span> ${T('lbl_opacity_s')}: <input type="range" id="bopa" min="1" max="100" value="100"> <span id="bov">100%</span>`;
             canvas.isDrawingMode = true;
             canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
             canvas.freeDrawingBrush.color = $fg().value;
@@ -169,8 +169,8 @@ function setTool(name) {
             break;
 
         case 'eraser':
-            html = `<i class="ph ph-eraser"></i> Eraser <span class="opt-sep"></span>
-                Size: <input type="range" id="esize" min="1" max="200" value="20"> <span id="esv">20px</span>`;
+            html = `<i class="ph ph-eraser"></i> ${T('tool_eraser')} <span class="opt-sep"></span>
+                ${T('lbl_size')}: <input type="range" id="esize" min="1" max="200" value="20"> <span id="esv">20px</span>`;
             canvas.isDrawingMode = true;
             canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
             canvas.freeDrawingBrush.color = 'white';
@@ -178,61 +178,61 @@ function setTool(name) {
             break;
 
         case 'bucket':
-            html = `<i class="ph ph-paint-bucket"></i> Paint Bucket — click on a shape to fill with foreground color`;
+            html = `<i class="ph ph-paint-bucket"></i> ${T('tool_bucket')}`;
             canvas.defaultCursor = 'crosshair';
             break;
 
         case 'gradient':
-            html = `<i class="ph ph-gradient"></i> Gradient — select object then <button class="psbtn" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyGradient()">Apply Gradient</button>
+            html = `<i class="ph ph-gradient"></i> ${T('tool_gradient')} <button class="psbtn" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyGradient()">${T('lbl_apply_grad')}</button>
                 <select id="grad-type" style="margin-left:8px"><option value="linear">Linear</option><option value="radial">Radial</option></select>`;
             break;
 
         case 'blur-tool':
-            html = `<i class="ph ph-drop"></i> Blur / Sharpen — select image, then:
-                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('blur')">Blur</button>
-                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('sharpen')">Sharpen</button>`;
+            html = `<i class="ph ph-drop"></i> ${T('tool_blur_tool')}
+                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('blur')">${T('lbl_blur_btn')}</button>
+                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('sharpen')">${T('lbl_sharpen_btn')}</button>`;
             break;
 
         case 'dodge':
-            html = `<i class="ph ph-sun-dim"></i> Dodge/Burn — select image:
-                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('brighten')">Dodge</button>
-                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('darken')">Burn</button>`;
+            html = `<i class="ph ph-sun-dim"></i> ${T('tool_dodge')}
+                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('brighten')">${T('lbl_dodge_btn')}</button>
+                <button class="psbtn sec" style="padding:1px 8px;font-size:10px;margin-left:8px" onclick="applyQuickFilter('darken')">${T('lbl_burn_btn')}</button>`;
             break;
 
         case 'pen':
-            html = `<i class="ph ph-pen-nib"></i> Pen — click to place points, double‑click to close path`;
+            html = `<i class="ph ph-pen-nib"></i> ${T('tool_pen')}`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             penPts = [];
             break;
 
         case 'text':
-            html = `<i class="ph ph-text-t"></i> Text — click canvas to add text <span class="opt-sep"></span>
-                Font: <select id="tfont"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Verdana</option><option>Impact</option><option>Comic Sans MS</option></select>
-                Size: <input type="number" id="tsize" value="40" style="width:50px">`;
+            html = `<i class="ph ph-text-t"></i> ${T('tool_text')} <span class="opt-sep"></span>
+                ${T('lbl_font')}: <select id="tfont"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Verdana</option><option>Impact</option><option>Comic Sans MS</option></select>
+                ${T('lbl_size')}: <input type="number" id="tsize" value="40" style="width:50px">`;
             canvas.defaultCursor = 'text';
             break;
 
         case 'shapes':
-            html = `<i class="ph ph-rectangle"></i> Shapes — drag to draw <span class="opt-sep"></span>
-                <select id="shape-sel"><option value="rect">Rectangle</option><option value="ellipse">Ellipse</option><option value="triangle">Triangle</option><option value="star">Star</option></select>
-                <label style="margin-left:8px;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" id="shape-fill" checked> Fill</label>
-                <label style="margin-left:8px;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" id="shape-stroke"> Stroke</label>`;
+            html = `<i class="ph ph-rectangle"></i> ${T('tool_shapes')} <span class="opt-sep"></span>
+                <select id="shape-sel"><option value="rect">${currentLang==='es'?'Rectángulo':'Rectangle'}</option><option value="ellipse">${currentLang==='es'?'Elipse':'Ellipse'}</option><option value="triangle">${currentLang==='es'?'Triángulo':'Triangle'}</option><option value="star">${currentLang==='es'?'Estrella':'Star'}</option></select>
+                <label style="margin-left:8px;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" id="shape-fill" checked> ${T('lbl_fill_chk')}</label>
+                <label style="margin-left:8px;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" id="shape-stroke"> ${T('lbl_stroke_chk')}</label>`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'line':
-            html = `<i class="ph ph-line-segment"></i> Line — drag to draw <span class="opt-sep"></span>
-                Width: <input type="range" id="lwidth" min="1" max="30" value="3"> <span id="lwv">3px</span>`;
+            html = `<i class="ph ph-line-segment"></i> ${T('tool_line')} <span class="opt-sep"></span>
+                ${T('lbl_width')}: <input type="range" id="lwidth" min="1" max="30" value="3"> <span id="lwv">3px</span>`;
             noSelect(); canvas.defaultCursor = 'crosshair';
             break;
 
         case 'hand':
-            html = `<i class="ph ph-hand-palm"></i> Hand — drag to pan`;
+            html = `<i class="ph ph-hand-palm"></i> ${T('tool_hand')}`;
             noSelect(); canvas.defaultCursor = 'grab';
             break;
 
         case 'zoom':
-            html = `<i class="ph ph-magnifying-glass"></i> Zoom — click (+), Alt+click (−), scroll wheel`;
+            html = `<i class="ph ph-magnifying-glass"></i> ${T('tool_zoom')}`;
             noSelect(); canvas.defaultCursor = 'zoom-in';
             break;
 
@@ -469,7 +469,7 @@ function starPoints(n, cx, cy, r) {
 
 // ── CROP ───────────────────────────────────────────────────────────
 window.applyCrop = function () {
-    if (!cropBox || cropBox.width < 2) return alert('Draw crop area first.');
+    if (!cropBox || cropBox.width < 2) return alert(T('alert_draw_crop'));
     const l = cropBox.left, t = cropBox.top, w = cropBox.width, h = cropBox.height;
     canvas.remove(cropBox); cropBox = null;
     canvas.getObjects().forEach(o => { o.set({ left: o.left - l, top: o.top - t }); o.setCoords(); });
@@ -483,7 +483,7 @@ window.applyCrop = function () {
 
 // ── GRADIENT ───────────────────────────────────────────────────────
 window.applyGradient = function () {
-    if (!activeObj) return alert('Select a shape or text first.');
+    if (!activeObj) return alert(T('alert_select_shape'));
     const type = document.getElementById('grad-type')?.value || 'linear';
     const coords = type === 'radial'
         ? { r1: 0, r2: activeObj.width/2, x1: activeObj.width/2, y1: activeObj.height/2, x2: activeObj.width/2, y2: activeObj.height/2 }
@@ -560,7 +560,7 @@ window.applyQuickFilter = function (name) {
     activeObj.applyFilters(); canvas.renderAll(); save();
 };
 window.removeAllFilters = function () {
-    if (!activeObj || activeObj.type !== 'image') return;
+    if (!activeObj || activeObj.type !== 'image') return alert(T('alert_select_img'));
     activeObj.filters = []; activeObj.applyFilters(); canvas.renderAll(); save();
 };
 
@@ -616,7 +616,7 @@ window.flattenImage = () => {
     fabric.Image.fromURL(url, img => { img.set({left:0,top:0,name:'Flattened',_id:Date.now()}); canvas.add(img); });
 };
 window.groupLayers = () => {
-    if (!activeObj || activeObj.type!=='activeSelection') return alert('Select multiple layers first (Ctrl+click).');
+    if (!activeObj || activeObj.type!=='activeSelection') return alert(T('alert_select_multi'));
     const group = activeObj.toGroup();
     group.name = 'Group'; canvas.renderAll(); refreshLayers();
 };
@@ -688,8 +688,8 @@ window.rotateCanvas   = deg => {
     canvas.renderAll(); save();
 };
 window.resizeCanvas = () => {
-    const w = prompt('New width:', canvas.width);
-    const h = prompt('New height:', canvas.height);
+    const w = prompt(T('alert_new_w'), canvas.width);
+    const h = prompt(T('alert_new_h'), canvas.height);
     if(w && h) {
         canvas.setDimensions({width:+w,height:+h});
         document.getElementById('doc-wrap').style.width = w+'px';
@@ -724,7 +724,7 @@ window.swapColors = () => { const f=$fg(), b=$bg(), t=f.value; f.value=b.value; 
 
 // ── EXPORT ─────────────────────────────────────────────────────────
 window.exportAs = function (fmt) {
-    if (!canvas) return alert('No document.');
+    if (!canvas) return alert(T('alert_no_doc'));
     canvas.discardActiveObject(); canvas.renderAll();
     if (fmt === 'json') {
         const blob = new Blob([JSON.stringify(canvas.toJSON(['_id','name','globalCompositeOperation']))], {type:'application/json'});
@@ -790,3 +790,143 @@ function hexToRgba(hex, a) {
     const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
     return `rgba(${r},${g},${b},${a})`;
 }
+
+// ── i18n — LANGUAGE SYSTEM ─────────────────────────────────────────
+let currentLang = localStorage.getItem('eml-lang') || 'es';
+
+const LANG = {
+    // Menus
+    menu_file:       { es:'Archivo',       en:'File' },
+    menu_edit:       { es:'Edición',       en:'Edit' },
+    menu_image:      { es:'Imagen',        en:'Image' },
+    menu_layer:      { es:'Capa',          en:'Layer' },
+    menu_filter:     { es:'Filtro',        en:'Filter' },
+    menu_view:       { es:'Vista',         en:'View' },
+    menu_help:       { es:'Ayuda',         en:'Help' },
+    // File
+    file_new:        { es:'Nuevo…',        en:'New…' },
+    file_open:       { es:'Abrir…',        en:'Open…' },
+    file_export_png: { es:'Exportar como PNG', en:'Export as PNG' },
+    file_export_jpg: { es:'Exportar como JPG', en:'Export as JPG' },
+    file_save_project:{ es:'Guardar Proyecto (.json)', en:'Save Project (.json)' },
+    file_load_project:{ es:'Cargar Proyecto (.json)',  en:'Load Project (.json)' },
+    // Edit
+    edit_undo:       { es:'Deshacer',      en:'Undo' },
+    edit_redo:       { es:'Rehacer',       en:'Redo' },
+    edit_copy:       { es:'Copiar',        en:'Copy' },
+    edit_paste:      { es:'Pegar',         en:'Paste' },
+    edit_delete:     { es:'Eliminar',      en:'Delete' },
+    edit_select_all: { es:'Seleccionar Todo', en:'Select All' },
+    edit_deselect:   { es:'Deseleccionar', en:'Deselect' },
+    // Image
+    img_rotate_cw:   { es:'Rotar lienzo 90° ↻', en:'Rotate Canvas 90° CW' },
+    img_rotate_ccw:  { es:'Rotar lienzo 90° ↺', en:'Rotate Canvas 90° CCW' },
+    img_flip_h:      { es:'Voltear Horizontal', en:'Flip Horizontal' },
+    img_flip_v:      { es:'Voltear Vertical',   en:'Flip Vertical' },
+    img_canvas_size: { es:'Tamaño del Lienzo…', en:'Canvas Size…' },
+    // Layer
+    layer_new:       { es:'Nueva Capa',     en:'New Layer' },
+    layer_duplicate: { es:'Duplicar Capa',  en:'Duplicate Layer' },
+    layer_delete:    { es:'Eliminar Capa',  en:'Delete Layer' },
+    layer_merge:     { es:'Combinar Abajo', en:'Merge Down' },
+    layer_flatten:   { es:'Acoplar Imagen', en:'Flatten Image' },
+    layer_forward:   { es:'Traer Adelante', en:'Bring Forward' },
+    layer_backward:  { es:'Enviar Atrás',   en:'Send Backward' },
+    // Filter
+    flt_brightness:  { es:'Brillo / Contraste…', en:'Brightness / Contrast…' },
+    flt_hue:         { es:'Tono / Saturación…',  en:'Hue / Saturation…' },
+    flt_invert:      { es:'Invertir',       en:'Invert' },
+    flt_grayscale:   { es:'Escala de Grises', en:'Grayscale' },
+    flt_sepia:       { es:'Sepia',          en:'Sepia' },
+    flt_vintage:     { es:'Vintage',        en:'Vintage' },
+    flt_blur:        { es:'Desenfocar',     en:'Blur' },
+    flt_sharpen:     { es:'Enfocar',        en:'Sharpen' },
+    flt_noise:       { es:'Añadir Ruido',   en:'Add Noise' },
+    flt_pixelate:    { es:'Pixelar',        en:'Pixelate' },
+    flt_remove_all:  { es:'Quitar Todos los Filtros', en:'Remove All Filters' },
+    // View
+    view_actual:     { es:'Tamaño Real',    en:'Actual Size' },
+    view_fit:        { es:'Ajustar a Pantalla', en:'Fit to Screen' },
+    // Panels
+    tab_properties:  { es:'Propiedades',    en:'Properties' },
+    tab_adjustments: { es:'Ajustes',        en:'Adjustments' },
+    tab_layers:      { es:'Capas',          en:'Layers' },
+    tab_channels:    { es:'Canales',        en:'Channels' },
+    tab_paths:       { es:'Trazados',       en:'Paths' },
+    opacity:         { es:'Opacidad',       en:'Opacity' },
+    fill:            { es:'Relleno',        en:'Fill' },
+    lock:            { es:'Bloquear',       en:'Lock' },
+    adjustments:     { es:'Ajustes',        en:'Adjustments' },
+    cancel:          { es:'Cancelar',       en:'Cancel' },
+    no_selection:    { es:'Sin selección',  en:'No selection' },
+    no_document:     { es:'Sin documento',  en:'No document' },
+    // Welcome
+    welcome_subtitle:{ es:'Editor de Fotos Profesional', en:'Professional Photo Editor' },
+    new_1920:        { es:'Nuevo 1920×1080', en:'New 1920×1080' },
+    new_1280:        { es:'Nuevo 1280×720',  en:'New 1280×720' },
+    new_800:         { es:'Nuevo 800×600',   en:'New 800×600' },
+    open_image:      { es:'Abrir Imagen…',  en:'Open Image…' },
+    // Tool descriptions
+    tool_move:       { es:'Herramienta Mover — Selecciona y mueve capas', en:'Move Tool — Select and move layers' },
+    tool_marquee:    { es:'Marco — Arrastra para seleccionar región', en:'Marquee — Drag to select region' },
+    tool_lasso:      { es:'Lazo — Selección a mano alzada', en:'Lasso — Freehand selection' },
+    tool_wand:       { es:'Varita Mágica — Clic para auto-seleccionar', en:'Magic Wand — Click to auto-select' },
+    tool_crop:       { es:'Recortar — Dibuja el área y recorta', en:'Crop — Draw area then apply' },
+    tool_eyedropper: { es:'Cuentagotas — Clic para copiar color', en:'Eyedropper — Click to sample color' },
+    tool_brush:      { es:'Pincel', en:'Brush' },
+    tool_eraser:     { es:'Borrador', en:'Eraser' },
+    tool_bucket:     { es:'Bote de Pintura — Clic para rellenar', en:'Paint Bucket — Click to fill' },
+    tool_gradient:   { es:'Degradado', en:'Gradient' },
+    tool_blur_tool:  { es:'Desenfocar / Enfocar', en:'Blur / Sharpen' },
+    tool_dodge:      { es:'Sobreexponer / Subexponer', en:'Dodge / Burn' },
+    tool_pen:        { es:'Pluma — Clic para puntos, doble clic para cerrar', en:'Pen — Click to place points, double-click to close' },
+    tool_text:       { es:'Texto — Clic para añadir texto', en:'Text — Click to add text' },
+    tool_shapes:     { es:'Formas — Arrastra para dibujar', en:'Shapes — Drag to draw' },
+    tool_line:       { es:'Línea — Arrastra para dibujar', en:'Line — Drag to draw' },
+    tool_hand:       { es:'Mano — Arrastra para mover vista', en:'Hand — Drag to pan' },
+    tool_zoom:       { es:'Zoom — Clic (+), Alt+clic (−)', en:'Zoom — Click (+), Alt+click (−)' },
+    // Labels used in options bar
+    lbl_size:        { es:'Tamaño', en:'Size' },
+    lbl_opacity_s:   { es:'Opacidad', en:'Opacity' },
+    lbl_font:        { es:'Fuente', en:'Font' },
+    lbl_shape:       { es:'Forma', en:'Shape' },
+    lbl_width:       { es:'Ancho', en:'Width' },
+    lbl_apply_crop:  { es:'Aplicar Recorte', en:'Apply Crop' },
+    lbl_apply_grad:  { es:'Aplicar Degradado', en:'Apply Gradient' },
+    lbl_blur_btn:    { es:'Desenfocar', en:'Blur' },
+    lbl_sharpen_btn: { es:'Enfocar', en:'Sharpen' },
+    lbl_dodge_btn:   { es:'Sobreexponer', en:'Dodge' },
+    lbl_burn_btn:    { es:'Subexponer', en:'Burn' },
+    lbl_fill_chk:    { es:'Relleno', en:'Fill' },
+    lbl_stroke_chk:  { es:'Contorno', en:'Stroke' },
+    // Alerts
+    alert_select_img:{ es:'Selecciona una capa de imagen.', en:'Select an image layer.' },
+    alert_select_shape:{es:'Selecciona una forma o texto.', en:'Select a shape or text first.' },
+    alert_draw_crop: { es:'Dibuja el área de recorte primero.', en:'Draw crop area first.' },
+    alert_no_doc:    { es:'No hay documento.', en:'No document.' },
+    alert_select_multi:{es:'Selecciona múltiples capas primero (Ctrl+clic).', en:'Select multiple layers first (Ctrl+click).' },
+    alert_new_w:     { es:'Nuevo ancho:', en:'New width:' },
+    alert_new_h:     { es:'Nuevo alto:', en:'New height:' },
+};
+
+function T(key) { return LANG[key] ? (LANG[key][currentLang] || LANG[key].es) : key; }
+
+function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (LANG[key]) el.textContent = LANG[key][currentLang];
+    });
+    document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+    // Re-render tool options bar for current tool if canvas exists
+    if (canvas) setTool(currentTool);
+}
+
+window.toggleLang = function() {
+    currentLang = currentLang === 'es' ? 'en' : 'es';
+    localStorage.setItem('eml-lang', currentLang);
+    applyLang();
+};
+
+// Apply saved language on load
+document.addEventListener('DOMContentLoaded', () => { applyLang(); });
+
