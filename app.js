@@ -22,7 +22,7 @@ function setupUI() {
     document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const tool = e.currentTarget.dataset.tool;
-            setTool(tool);
+            if (tool) setTool(tool);
         });
     });
 
@@ -30,7 +30,8 @@ function setupUI() {
     colorFg.addEventListener('change', () => updateBrushColor());
     
     // File upload binding
-    document.getElementById('upload-img').addEventListener('change', handleImageUpload);
+    const uploader = document.getElementById('upload-img');
+    if(uploader) uploader.addEventListener('change', handleImageUpload);
     
     // Global Keyboard shortcuts
     window.addEventListener('keydown', handleKeyMap);
@@ -45,7 +46,8 @@ window.swapColors = function() {
 }
 
 window.createNewDocument = function(w = 1200, h = 800) {
-    document.getElementById('welcome-modal').style.display = 'none';
+    const modal = document.getElementById('welcome-modal');
+    if(modal) modal.style.display = 'none';
     const container = document.getElementById('canvas-document');
     container.style.display = 'block';
     container.style.width = w + 'px';
@@ -106,7 +108,7 @@ function addFabricImage(file) {
                 top: canvas.height/2,
                 originX: 'center',
                 originY: 'center',
-                name: file.name || 'Capa Imagen',
+                name: file.name || 'Layer',
                 id: Date.now()
             });
             canvas.add(img);
@@ -123,7 +125,8 @@ function setTool(toolName) {
     
     // Visual update
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`[data-tool="${toolName}"]`).classList.add('active');
+    const btnToActive = document.querySelector(`[data-tool="${toolName}"]`);
+    if(btnToActive) btnToActive.classList.add('active');
     
     // Reset canvas modes
     canvas.isDrawingMode = false;
@@ -135,14 +138,14 @@ function setTool(toolName) {
     
     switch(toolName) {
         case 'select':
-            optionsHtml = `<i class="ph ph-cursor options-tool-icon"></i><span class="options-label">Auto-Select: Capa</span>`;
+            optionsHtml = `<i class="ph ph-cursor options-tool-icon"></i><span class="options-label">Auto-Select:</span><input type="checkbox" checked>`;
             canvas.defaultCursor = 'default';
             break;
             
         case 'brush':
             optionsHtml = `
                 <i class="ph ph-paint-brush-broad options-tool-icon"></i>
-                <span class="options-label">Tamaño:</span>
+                <span class="options-label">Size:</span>
                 <input type="range" id="brush-size" min="1" max="150" value="15" style="width: 100px;">
                 <span id="brush-size-val" style="margin-right:15px; color:#ddd;">15px</span>
             `;
@@ -155,9 +158,8 @@ function setTool(toolName) {
         case 'eraser':
             optionsHtml = `
                 <i class="ph ph-eraser options-tool-icon"></i>
-                <span class="options-label">Tamaño:</span>
+                <span class="options-label">Size:</span>
                 <input type="range" id="eraser-size" min="1" max="150" value="30" style="width: 100px;">
-                <span style="color:#aaa; font-size:10px;">(Simulado pintando blanco)</span>
             `;
             canvas.isDrawingMode = true;
             canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
@@ -166,16 +168,16 @@ function setTool(toolName) {
             break;
             
         case 'text':
-            optionsHtml = `<i class="ph ph-text-t options-tool-icon"></i><span class="options-label">Haz clic en el lienzo para añadir texto.</span>`;
+            optionsHtml = `<i class="ph ph-text-t options-tool-icon"></i><span class="options-label">Click on canvas to add text.</span>`;
             canvas.defaultCursor = 'text';
             break;
             
         case 'shapes':
             optionsHtml = `<i class="ph ph-rectangle options-tool-icon"></i>
-                           <span class="options-label">Forma:</span>
+                           <span class="options-label">Shape:</span>
                            <select id="shape-type" style="background:#535353; color:#fff; border:1px solid #333; padding:2px; height:22px;">
-                                <option value="rect">Rectángulo</option>
-                                <option value="circle">Elipse</option>
+                                <option value="rect">Rectangle</option>
+                                <option value="circle">Ellipse</option>
                            </select>`;
             canvas.defaultCursor = 'crosshair';
             canvas.selection = false;
@@ -183,14 +185,24 @@ function setTool(toolName) {
             break;
             
         case 'hand':
-            optionsHtml = `<i class="ph ph-hand-palm options-tool-icon"></i><span class="options-label">Arrastra para paneo.</span>`;
+            optionsHtml = `<i class="ph ph-hand-palm options-tool-icon"></i><span class="options-label">Click and drag to pan the view.</span>`;
             canvas.defaultCursor = 'grab';
             canvas.selection = false;
             canvas.forEachObject(o => o.selectable = false);
             break;
             
+        case 'zoom':
+            optionsHtml = `<i class="ph ph-magnifying-glass options-tool-icon"></i><span class="options-label">Click to zoom in. Alt+Click to zoom out.</span>`;
+            canvas.defaultCursor = 'zoom-in';
+            canvas.selection = false;
+            canvas.forEachObject(o => o.selectable = false);
+            break;
+            
         default:
-             optionsHtml = `<i class="ph ph-wrench options-tool-icon"></i><span class="options-label">Herramienta no implementada aún en la versión Web.</span>`;
+            // For complex tools not yet implemented fully:
+            optionsHtml = `<i class="ph ph-warning-circle options-tool-icon" style="color:#FFA500;"></i><span class="options-label">Tool under development.</span>`;
+            canvas.defaultCursor = 'default';
+            break;
     }
     
     optionsBar.innerHTML = optionsHtml;
@@ -241,6 +253,16 @@ function setupCanvasPanZoom() {
 
     canvas.on('mouse:down', function(opt) {
         var evt = opt.e;
+        
+        if (currentTool === 'zoom') {
+            var zoom = canvas.getZoom();
+            if(evt.altKey) { zoom *= 0.8; } else { zoom *= 1.2; }
+            if (zoom > 20) zoom = 20;
+            if (zoom < 0.1) zoom = 0.1;
+            canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+            return;
+        }
+
         if (currentTool === 'hand' || evt.altKey || isPanning) {
             isDragging = true;
             canvas.defaultCursor = 'grabbing';
@@ -253,16 +275,16 @@ function setupCanvasPanZoom() {
             const shapeType = document.getElementById('shape-type').value;
             
             if(shapeType === 'rect') {
-                tempShape = new fabric.Rect({ left: pointer.x, top: pointer.y, width: 0, height: 0, fill: colorFg.value, id: Date.now(), name: 'Rectángulo' });
+                tempShape = new fabric.Rect({ left: pointer.x, top: pointer.y, width: 0, height: 0, fill: colorFg.value, id: Date.now(), name: 'Rectangle' });
             } else {
-                tempShape = new fabric.Ellipse({ left: pointer.x, top: pointer.y, rx: 0, ry: 0, fill: colorFg.value, id: Date.now(), name: 'Elipse' });
+                tempShape = new fabric.Ellipse({ left: pointer.x, top: pointer.y, rx: 0, ry: 0, fill: colorFg.value, id: Date.now(), name: 'Ellipse' });
             }
             canvas.add(tempShape);
         }
         else if (currentTool === 'text' && !activeObject) {
             const pointer = canvas.getPointer(evt);
-            const text = new fabric.IText('Texto Nuevo', {
-                left: pointer.x, top: pointer.y, fontFamily: 'Arial', fill: colorFg.value, fontSize: 40, name: 'Capa Texto', id: Date.now()
+            const text = new fabric.IText('New Text', {
+                left: pointer.x, top: pointer.y, fontFamily: 'Arial', fill: colorFg.value, fontSize: 40, name: 'Text Layer', id: Date.now()
             });
             canvas.add(text);
             canvas.setActiveObject(text);
@@ -324,9 +346,10 @@ function updateLayers() {
         const obj = objects[i];
         const isActive = activeObject === obj ? 'active' : '';
         const eyeIcon = obj.visible !== false ? 'ph-eye' : 'ph-eye-closed';
-        const name = obj.name || (obj.type === 'image' ? 'Capa' : obj.type);
+        const name = obj.name || (obj.type === 'image' ? 'Layer '+(i+1) : obj.type);
         const typeIcon = obj.type === 'i-text' ? 'text-t' : (obj.type === 'image' ? 'image' : 'shape-polygon');
         
+        // Exact PS aesthetics
         html += `
             <div class="layer-item ${isActive}" onclick="selectLayer(${i})">
                 <i class="ph ${eyeIcon} layer-eye" onclick="event.stopPropagation(); toggleVisibility(${i})"></i>
@@ -360,7 +383,7 @@ window.toggleVisibility = function(index) {
 }
 
 window.addNewEmptyLayer = function() {
-    alert("Para dibujar, selecciona el pincel (B). Fabric genera vectores listados como capas individuales automáticamente.");
+    alert("In this web version, just draw with the Brush or create a shape, and it will spawn as a new layer automatically.");
 };
 
 window.duplicateLayer = function() {
@@ -370,7 +393,7 @@ window.duplicateLayer = function() {
             cloned.set({
                 left: cloned.left + 20,
                 top: cloned.top + 20,
-                name: cloned.name + ' copia',
+                name: cloned.name + ' copy',
                 evented: true,
                 id: Date.now()
             });
@@ -399,49 +422,55 @@ window.deleteActive = function() {
     }
 };
 
-document.getElementById('layer-opacity-val').addEventListener('input', (e) => {
-    if(activeObject) {
-        activeObject.set('opacity', e.target.value / 100);
-        canvas.renderAll();
-    }
-});
+const opVal = document.getElementById('layer-opacity-val');
+if(opVal) {
+    opVal.addEventListener('input', (e) => {
+        if(activeObject) {
+            activeObject.set('opacity', e.target.value / 100);
+            canvas.renderAll();
+        }
+    });
+}
 
-document.getElementById('layer-blend-mode').addEventListener('change', (e) => {
-    if(activeObject) {
-        let val = e.target.value;
-        if(val === 'normal') val = 'source-over';
-        activeObject.set('globalCompositeOperation', val);
-        canvas.renderAll();
-    }
-});
+const blendMode = document.getElementById('layer-blend-mode');
+if(blendMode) {
+    blendMode.addEventListener('change', (e) => {
+        if(activeObject) {
+            let val = e.target.value;
+            if(val === 'normal') val = 'source-over';
+            activeObject.set('globalCompositeOperation', val);
+            canvas.renderAll();
+        }
+    });
+}
 
 // ---------------- Properties Panel ----------------
 function updateProperties() {
     if(!activeObject) {
-        propPanel.innerHTML = '<div class="empty-selection text-center" style="color:#aaa; font-style:italic; padding: 20px;">Sin selección</div>';
+        propPanel.innerHTML = '<div class="empty-selection text-center" style="color:#aaa; font-style:italic; padding: 20px;">No layer selected</div>';
         return;
     }
     
     let html = '<div class="prop-form">';
     // Dimensiones
     html += `
-        <div class="prop-row"><span class="prop-label">Ancho:</span><input type="number" class="prop-input" value="${Math.round(activeObject.width * activeObject.scaleX)}" disabled> px</div>
-        <div class="prop-row"><span class="prop-label">Alto:</span><input type="number" class="prop-input" value="${Math.round(activeObject.height * activeObject.scaleY)}" disabled> px</div>
-        <div class="prop-row"><span class="prop-label">Ángulo:</span><input type="number" class="prop-input" value="${Math.round(activeObject.angle || 0)}" disabled> °</div>
+        <div class="prop-row"><span class="prop-label">W:</span><input type="number" class="prop-input" value="${Math.round(activeObject.width * activeObject.scaleX)}" disabled> px</div>
+        <div class="prop-row"><span class="prop-label">H:</span><input type="number" class="prop-input" value="${Math.round(activeObject.height * activeObject.scaleY)}" disabled> px</div>
+        <div class="prop-row"><span class="prop-label">Angle:</span><input type="number" class="prop-input" value="${Math.round(activeObject.angle || 0)}" disabled> °</div>
     `;
     
     if(activeObject.type === 'i-text') {
         html += `
             <div style="height:1px; background:var(--ps-divider); margin:10px 0;"></div>
             <div class="prop-row"><span class="prop-label">Color:</span><input type="color" id="prop-text-color" value="${activeObject.fill}"></div>
-            <div class="prop-row"><span class="prop-label">Tamaño pt:</span><input type="number" class="prop-input" id="prop-text-size" value="${activeObject.fontSize}"></div>
+            <div class="prop-row"><span class="prop-label">Font Size:</span><input type="number" class="prop-input" id="prop-text-size" value="${activeObject.fontSize}"></div>
         `;
     }
     
     if(activeObject.type === 'rect' || activeObject.type === 'ellipse' || activeObject.type === 'path') {
         html += `
              <div style="height:1px; background:var(--ps-divider); margin:10px 0;"></div>
-             <div class="prop-row"><span class="prop-label">Relleno:</span><input type="color" id="prop-shape-fill" value="${activeObject.fill || '#000000'}"></div>
+             <div class="prop-row"><span class="prop-label">Fill:</span><input type="color" id="prop-shape-fill" value="${activeObject.fill || '#000000'}"></div>
         `;
     }
     
@@ -460,7 +489,7 @@ function updateProperties() {
 // ---------------- Filters Logic ----------------
 window.applyFilter = function(filterName) {
     if(!activeObject || activeObject.type !== 'image') {
-        alert("Paso 1: Selecciona una capa tipo Imagen haciendo click.\nPaso 2: Ve a Filtro > Aplicar.");
+        alert("Please select an Image layer first.");
         return;
     }
     
@@ -474,7 +503,7 @@ window.applyFilter = function(filterName) {
             activeObject.filters.push(new fabric.Image.filters.Noise({ noise: 100 }));
             break;
         case 'blur':
-            activeObject.filters.push(new fabric.Image.filters.Blur({ blur: 0.2 })); // simple blur
+            activeObject.filters.push(new fabric.Image.filters.Blur({ blur: 0.2 }));
             break;
     }
     
@@ -521,7 +550,7 @@ window.redo = function() {
 // ---------------- Export ----------------
 window.downloadImage = function() {
     if(!canvas) {
-        alert("Crea un documento primero.");
+        alert("Create a document first.");
         return;
     }
     canvas.discardActiveObject();
@@ -551,15 +580,23 @@ function handleKeyMap(e) {
         setTool('hand');
     }
     
-    // Tools
+    // Tools keys
     if(!e.ctrlKey && !e.altKey && !e.shiftKey) {
         switch(e.key.toLowerCase()) {
             case 'v': setTool('select'); break;
+            case 'm': setTool('marquee'); break;
+            case 'l': setTool('lasso'); break;
+            case 'w': setTool('wand'); break;
+            case 'c': setTool('crop'); break;
+            case 'i': setTool('eyedropper'); break;
             case 'b': setTool('brush'); break;
             case 'e': setTool('eraser'); break;
+            case 'g': setTool('gradient'); break;
+            case 'p': setTool('pen'); break;
             case 't': setTool('text'); break;
             case 'u': setTool('shapes'); break;
             case 'h': setTool('hand'); break;
+            case 'z': setTool('zoom'); break;
         }
     }
     

@@ -30,15 +30,18 @@
                     <div class="dropdown-item" onclick="undo()">Deshacer <span>Ctrl+Z</span></div>
                     <div class="dropdown-item" onclick="redo()">Rehacer <span>Ctrl+Y</span></div>
                     <div class="dropdown-divider"></div>
-                    <div class="dropdown-item" onclick="deleteActive()">Borrar <span>Espacio</span></div>
+                    <div class="dropdown-item" onclick="deleteActive()">Borrar <span>Supr</span></div>
                 </div>
             </div>
+            <div class="menu-item">Imagen</div>
             <div class="menu-item">Capa
                 <div class="dropdown">
                     <div class="dropdown-item" onclick="addNewEmptyLayer()">Nueva Capa... <span>Shift+Ctrl+N</span></div>
                     <div class="dropdown-item" onclick="duplicateLayer()">Duplicar Capa <span>Ctrl+J</span></div>
                 </div>
             </div>
+            <div class="menu-item">Texto</div>
+            <div class="menu-item">Selección</div>
             <div class="menu-item">Filtro
                  <div class="dropdown">
                     <div class="dropdown-item" onclick="applyFilter('blur')">Desenfocar</div>
@@ -46,6 +49,8 @@
                     <div class="dropdown-item" onclick="applyFilter('grayscale')">Blanco y Negro</div>
                 </div>
             </div>
+            <div class="menu-item">Vista</div>
+            <div class="menu-item">Ventana</div>
             <div class="menu-item">Ayuda</div>
         </nav>
     </header>
@@ -62,31 +67,50 @@
 
     <!-- Main App Layout -->
     <div class="main-layout">
-        <!-- Left Toolbar -->
+        <!-- Left Toolbar exact replica -->
         <aside class="left-toolbar" id="toolbar">
-            <div class="toolbar-grid">
-                <button class="tool-btn active" data-tool="select" title="Mover (V)"><i class="ph ph-cursor"></i></button>
-                <button class="tool-btn" data-tool="brush" title="Pincel (B)"><i class="ph ph-paint-brush-broad"></i></button>
-                <button class="tool-btn" data-tool="eraser" title="Borrador (E)"><i class="ph ph-eraser"></i></button>
-                <button class="tool-btn" data-tool="text" title="Texto (T)"><i class="ph ph-text-t"></i></button>
-                <button class="tool-btn" data-tool="shapes" title="Rectángulo (U)"><i class="ph ph-rectangle"></i></button>
-                <button class="tool-btn" data-tool="hand" title="Mano (H) / Paneo"><i class="ph ph-hand-palm"></i></button>
+            <div class="toolbar-grid" style="display:flex; flex-direction:column; gap:1px; width:32px; align-items:center;">
+                <!-- Full Photoshop Toolset -->
+                <button class="tool-btn active" data-tool="select" title="Herramienta Mover (V)"><i class="ph ph-cursor"></i></button>
+                <button class="tool-btn" data-tool="marquee" title="Marco Rectangular (M)"><i class="ph ph-bounding-box"></i></button>
+                <button class="tool-btn" data-tool="lasso" title="Herramienta Lazo (L)"><i class="ph ph-selection-plus"></i></button>
+                <button class="tool-btn" data-tool="wand" title="Varita Mágica (W)"><i class="ph ph-magic-wand"></i></button>
+                <button class="tool-btn" data-tool="crop" title="Herramienta Recortar (C)"><i class="ph ph-crop"></i></button>
+                <button class="tool-btn" data-tool="frame" title="Herramienta Marco (K)"><i class="ph ph-frame-corners"></i></button>
+                <button class="tool-btn" data-tool="eyedropper" title="Herramienta Cuentagotas (I)"><i class="ph ph-eyedropper"></i></button>
+                <button class="tool-btn" data-tool="healing" title="Pincel Corrector Puntual (J)"><i class="ph ph-bandaids"></i></button>
+                <button class="tool-btn" data-tool="brush" title="Herramienta Pincel (B)"><i class="ph ph-paint-brush-broad"></i></button>
+                <button class="tool-btn" data-tool="clone" title="Tampón de Clonar (S)"><i class="ph ph-stamp"></i></button>
+                <button class="tool-btn" data-tool="historybrush" title="Pincel de Historia (Y)"><i class="ph ph-clock-counter-clockwise"></i></button>
+                <button class="tool-btn" data-tool="eraser" title="Herramienta Borrador (E)"><i class="ph ph-eraser"></i></button>
+                <button class="tool-btn" data-tool="gradient" title="Herramienta Degradado (G)"><i class="ph ph-gradient"></i></button>
+                <button class="tool-btn" data-tool="blurtool" title="Herramienta Desenfocar"><i class="ph ph-drop"></i></button>
+                <button class="tool-btn" data-tool="dodge" title="Herramienta Sobreexponer (O)"><i class="ph ph-moon"></i></button>
+                <button class="tool-btn" data-tool="pen" title="Herramienta Pluma (P)"><i class="ph ph-pen-nib"></i></button>
+                <button class="tool-btn" data-tool="text" title="Herramienta Texto Horizontal (T)"><i class="ph ph-text-t"></i></button>
+                <button class="tool-btn" data-tool="pathselect" title="Selección de Trazado (A)"><i class="ph ph-navigation-arrow"></i></button>
+                <button class="tool-btn" data-tool="shapes" title="Herramienta Rectángulo (U)"><i class="ph ph-rectangle"></i></button>
+                <button class="tool-btn" data-tool="hand" title="Herramienta Mano (H)"><i class="ph ph-hand-palm"></i></button>
+                <button class="tool-btn" data-tool="zoom" title="Herramienta Zoom (Z)"><i class="ph ph-magnifying-glass"></i></button>
             </div>
             
-            <div class="color-picker-widget">
+            <div class="color-picker-widget" style="margin-top:10px;">
                 <input type="color" id="primary-color" value="#000000" class="color-swatch fg-swatch">
                 <input type="color" id="secondary-color" value="#ffffff" class="color-swatch bg-swatch">
-                <i class="ph ph-arrows-down-up swap-colors" onclick="swapColors()" title="Invertir colores"></i>
+                <i class="ph ph-arrows-down-up swap-colors" onclick="swapColors()" title="Invertir colores (X)"></i>
             </div>
+            
+            <div class="quick-mask-btn" style="margin-top:15px; margin-bottom:5px;">
+                <button class="tool-btn" title="Editar en modo Máscara rápida (Q)"><i class="ph ph-selection-inverse"></i></button>
+            </div>
+            
         </aside>
 
         <!-- Workspace canvas area -->
         <main class="workspace-area" id="workspace-wrapper">
-            <!-- document canvas background container -->
             <div class="canvas-document" id="canvas-document" style="display:none;">
                 <canvas id="ps-canvas"></canvas>
             </div>
-            <!-- Initial Modal -->
             <div id="welcome-modal" class="modal">
                 <img src="assets/logo.png" alt="PS Logo" onerror="this.src=''; this.style.display='none';">
                 <h2>EML STUDIO</h2>
@@ -96,47 +120,75 @@
             </div>
         </main>
 
-        <!-- Right Panels -->
-        <aside class="right-panels">
-            <!-- Properties / Adjustments -->
-            <div class="panel-group" style="flex: 0 0 250px;">
+        <!-- Right Panels exactly like screenshot -->
+        <aside class="right-panels" style="width: 290px;">
+            <!-- Properties / Adjustments / Libraries -->
+            <div class="panel-group" style="flex: 0 0 220px;">
                 <div class="panel-tabs">
-                    <div class="tab active">Propiedades</div>
+                    <div class="tab active">Properties</div>
+                    <div class="tab">Adjustments</div>
+                    <div class="tab">Libraries</div>
                 </div>
                 <div class="panel-content" id="properties-panel">
-                    <div class="empty-selection text-center" style="color:#aaa; font-style:italic; padding: 20px;">Sin selección</div>
+                    <div class="empty-selection text-center" style="color:#aaa; font-style:italic; padding: 20px;">No layer selected</div>
                 </div>
             </div>
 
-            <!-- Layers Panel -->
+            <!-- Layers / Channels / Paths -->
             <div class="panel-group" style="flex: 1; display:flex; flex-direction:column;">
                 <div class="panel-tabs">
-                    <div class="tab active">Capas</div>
+                    <div class="tab active">Layers</div>
+                    <div class="tab">Channels</div>
+                    <div class="tab">Paths</div>
                 </div>
-                <!-- Layer blending options -->
-                <div class="layer-bar-options">
-                    <div class="layer-blend">
-                        <select id="layer-blend-mode">
+                
+                <div style="padding: 8px 10px; border-bottom: 1px solid var(--ps-darker);">
+                    <!-- Blend and Opacity Row -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <select id="layer-blend-mode" style="background:var(--ps-darker); border:1px solid var(--ps-border); color:var(--ps-text-light); padding:2px; height:22px; width:100px; font-size:11px;">
                             <option value="normal">Normal</option>
-                            <option value="multiply">Multiplicar</option>
-                            <option value="screen">Trama</option>
-                            <option value="overlay">Superponer</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="screen">Screen</option>
+                            <option value="overlay">Overlay</option>
                         </select>
+                        <div class="layer-opacity" style="font-size:11px;">
+                            <span style="color:#aaa;">Opacity:</span>
+                            <input type="number" id="layer-opacity-val" min="0" max="100" value="100" style="width: 40px; background: transparent; border: 1px solid transparent; color: var(--ps-text-light); text-align: right; padding:2px;">
+                        </div>
                     </div>
-                    <div class="layer-opacity">
-                        <span>Opacidad:</span>
-                        <input type="number" id="layer-opacity-val" min="0" max="100" value="100">
+                    
+                    <!-- Lock Row -->
+                    <div style="display:flex; align-items:center; font-size:11px; color:#aaa; gap:10px;">
+                        <span>Lock:</span>
+                        <div style="display:flex; gap:6px;">
+                            <i class="ph ph-checkerboard" title="Lock transparent pixels" style="cursor:pointer; font-size:13px;"></i>
+                            <i class="ph ph-paint-brush" title="Lock image pixels" style="cursor:pointer; font-size:13px;"></i>
+                            <i class="ph ph-arrows-out-cardinal" title="Lock position" style="cursor:pointer; font-size:13px;"></i>
+                            <i class="ph ph-lock-key" title="Lock all" style="cursor:pointer; font-size:13px;"></i>
+                        </div>
+                        <div style="margin-left:auto; display:flex; align-items:center;">
+                            <span>Fill:</span>
+                            <input type="text" value="100%" style="width: 35px; background: transparent; border: none; color: var(--ps-text-light); text-align: right; margin-left:4px;" disabled>
+                        </div>
                     </div>
                 </div>
+
                 <!-- Layer List Core -->
-                <div class="panel-content layer-list-container" id="layers-list">
+                <div class="panel-content layer-list-container" id="layers-list" style="background:#404040;">
                     <!-- Javascript generates layer items here -->
                 </div>
-                <!-- Layer Footer Action Buttons -->
-                <div class="panel-footer-actions">
-                    <i class="ph ph-plus-square" title="Nueva capa" onclick="addNewEmptyLayer()"></i>
-                    <i class="ph ph-copy" title="Duplicar capa" onclick="duplicateLayer()"></i>
-                    <i class="ph ph-trash" title="Eliminar capa" onclick="deleteActive()"></i>
+                
+                <!-- Layer Footer Action Buttons (Fx, Mask, Adjustment, Group, New, Delete) -->
+                <div class="panel-footer-actions" style="justify-content:space-between; padding: 0 15px;">
+                    <i class="ph ph-link" title="Link layers" style="opacity:0.3;"></i>
+                    <div style="display:flex; gap:10px;">
+                        <i class="ph ph-text-b" title="Add a layer style"></i>
+                        <i class="ph ph-mask-c" title="Add layer mask"></i>
+                        <i class="ph ph-circle-half-tilt" title="Create new fill or adjustment layer"></i>
+                        <i class="ph ph-folder-notch" title="Create a new group"></i>
+                        <i class="ph ph-plus-square" title="Create a new layer" onclick="addNewEmptyLayer()"></i>
+                        <i class="ph ph-trash" title="Delete layer" onclick="deleteActive()"></i>
+                    </div>
                 </div>
             </div>
         </aside>
